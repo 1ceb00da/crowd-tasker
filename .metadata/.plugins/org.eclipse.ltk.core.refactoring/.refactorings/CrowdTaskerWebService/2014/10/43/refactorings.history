@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;CrowdTaskerWebService/ConnectionProvider.py&apos; to &apos;ConnectionHandler.py&apos;" description="Rename resource &apos;ConnectionProvider.py&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="ConnectionProvider.py" name="ConnectionHandler.py" stamp="1413750033758" updateReferences="true"/>
+</session>

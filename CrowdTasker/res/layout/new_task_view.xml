@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp" >
+     <TextView android:id="@+id/new_task_header_title"
+	        android:text="@string/new_task_header" 
+	        android:layout_width="wrap_content" android:layout_height="wrap_content" 
+	        android:layout_marginBottom="5dp"
+	        android:textAppearance="?android:attr/textAppearanceLarge"
+	        android:textStyle="bold"
+	        android:layout_alignParentTop="true"/> 
+	        
+    <RelativeLayout   android:id="@+id/new_task_field_wrapper"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	   android:layout_below="@+id/new_task_header_title">
+	   
+	    <LinearLayout android:id="@+id/new_task_linear_layout"
+	    	android:orientation="vertical"
+	    	android:layout_width="fill_parent"
+	    	android:layout_height="wrap_content">
+	    	
+			    <EditText android:hint="@string/task_name_hint" android:id="@+id/name"
+			        android:layout_width="match_parent" android:layout_height="wrap_content" 
+			        android:layout_marginBottom="3dp" />
+			    <EditText android:hint="@string/task_description_hint" android:id="@+id/description"
+			        android:layout_width="match_parent" android:layout_height="wrap_content" 
+			        android:layout_marginBottom="3dp" />
+			    
+			    <EditText android:hint="@string/task_payment_hint" android:id="@+id/payment"
+			        android:layout_width="match_parent" android:layout_height="wrap_content" 
+			        android:layout_marginBottom="2dp" />
+			    <Button android:hint="@string/task_deadline_hint" android:id="@+id/deadline"
+			        android:layout_width="match_parent" android:layout_height="wrap_content" 
+			        android:layout_marginBottom="2dp" />
+			    <Button android:hint="@string/task_pickup_loc_hint" android:id="@+id/pickup_loc"
+			        android:layout_width="match_parent" android:layout_height="wrap_content" 
+			        android:layout_marginBottom="2dp" />
+			    <Button android:hint="@string/task_dropoff_loc_hint" android:id="@+id/dropoff_loc"
+			        android:layout_width="match_parent" android:layout_height="wrap_content" 
+			        android:layout_marginBottom="2dp" />
+	    </LinearLayout>
+    
+	    <Button android:text="@string/create" android:id="@+id/create_btn" 
+	        android:layout_width="wrap_content" android:layout_height="wrap_content" 
+	        android:layout_below="@+id/new_task_linear_layout" 
+	        android:layout_alignParentRight="true"
+	        android:paddingLeft="25dp" android:paddingRight="25dp"/> 
+   </RelativeLayout>
+        
+</RelativeLayout>

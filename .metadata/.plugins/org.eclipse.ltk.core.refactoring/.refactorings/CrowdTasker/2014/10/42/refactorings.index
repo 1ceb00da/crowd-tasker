@@ -1,0 +1,12 @@
+1413511013379	Rename local variable 'request'
+1413511650831	Rename package 'usc.edu.crowdtasker.provider'
+1413511719394	Encapsulate field 'login'
+1413511724241	Encapsulate field 'email'
+1413600810373	Encapsulate field 'id'
+1413665033830	Copy file
+1413666608897	Encapsulate field 'pickupLocAddress'
+1413666614044	Encapsulate field 'dropoffLocAddress'
+1413666940433	Rename field 'pickupLocation'
+1413666948931	Rename field 'dropoffLocation'
+1413667674541	Encapsulate field 'status'
+1413676002500	Delete element

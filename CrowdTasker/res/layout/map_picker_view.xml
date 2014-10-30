@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <RelativeLayout android:layout_width="match_parent"
+    		android:layout_height="wrap_content" 
+    		android:id="@+id/btn_wrapper">
+    	<TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+    	    android:id="@+id/title" android:textAppearance="?android:attr/textAppearanceMedium"
+    	    android:layout_marginTop="10dp" android:layout_marginLeft="10dp" android:textStyle="bold"/>    	    
+    		
+        <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/ok" android:id="@+id/ok_btn"
+            android:layout_toLeftOf="@+id/cancel_btn"/>
+        <Button android:layout_width="wrap_content" 
+            android:layout_alignParentRight="true" android:layout_height="wrap_content"
+            android:text="@string/cancel" android:id="@+id/cancel_btn"/>
+    </RelativeLayout>
+    
+     <FrameLayout  
+        android:layout_width="match_parent"
+    	android:layout_height="match_parent"
+    	android:layout_below="@+id/btn_wrapper"
+    	android:id="@+id/map_wrapper">
+	    <fragment 
+	 		android:id="@+id/map"
+	  		android:layout_width="match_parent"
+	  		android:layout_height="match_parent"
+	  		android:name="com.google.android.gms.maps.MapFragment"/>
+    </FrameLayout>
+    
+</RelativeLayout>
