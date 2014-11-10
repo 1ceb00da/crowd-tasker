@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <header android:fragment="usc.edu.crowdtasker.settings.LocationRangeSettings"
+            android:title="@string/location_range_settings"
+            android:summary="@string/location_range_settings_desc" />
+
+</preference-headers>

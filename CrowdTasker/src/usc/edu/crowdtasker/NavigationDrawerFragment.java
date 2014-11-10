@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +30,11 @@ import android.widget.Toast;
  */
 public class NavigationDrawerFragment extends Fragment {
 
+	
+	public static final int NAV_PROFILE = 0;
+	public static final int NAV_SETTINGS = 1;
+	public static final int NAV_LOGOUT = 2;
+	
     /**
      * Remember the position of the selected item.
      */
@@ -142,10 +148,10 @@ public class NavigationDrawerFragment extends Fragment {
                 R.string.navigation_drawer_close  /* "close drawer" description for accessibility */
         ) {
         	
-        	@Override
+        	/*@Override
         	public boolean onOptionsItemSelected(MenuItem item) {
         		return optionsItemSelected(item);
-        	}
+        	}*/
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
@@ -246,7 +252,8 @@ public class NavigationDrawerFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @Override
+   
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle != null && mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
@@ -268,7 +275,7 @@ public class NavigationDrawerFragment extends Fragment {
             Toast.makeText(getActivity(), "Log out action.", Toast.LENGTH_SHORT).show();
             return true;
         }else return false;
-    }
+    }*/
 
     /**
      * Per the navigation drawer design guidelines, updates the action bar to show the global app

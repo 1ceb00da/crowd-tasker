@@ -3,8 +3,10 @@ package usc.edu.crowdtasker;
 import java.util.Locale;
 
 import usc.edu.crowdtasker.NavigationDrawerFragment;
+import usc.edu.crowdtasker.settings.SettingsActivity;
 import usc.edu.crowdtasker.tasker.TaskerView;
 import usc.edu.crowdtasker.worker.WorkerView;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -50,7 +52,6 @@ public class MainActivity extends ActionBarActivity implements
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-       
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -93,7 +94,6 @@ public class MainActivity extends ActionBarActivity implements
     
     @Override
     protected void onResume() {    
-    	Log.e(TAG, "MAIN ONRESUME");
     	mSectionsPagerAdapter.updateCurrentFragment();
     	super.onResume();
     }
@@ -102,7 +102,18 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public void onNavigationDrawerItemSelected(int position) {
     	
-    	Log.d("MainActivity", "NAVIGATION DRAWER ITEM "+position);
+    	switch(position){
+	    	case NavigationDrawerFragment.NAV_PROFILE:
+	    		break;
+	    	case NavigationDrawerFragment.NAV_SETTINGS:
+	    		Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+	    		startActivity(intent);
+	    		break;
+	    	case NavigationDrawerFragment.NAV_LOGOUT:
+	    		break;
+	    	default:
+	    		break;
+    	}
         // update the main content by replacing fragments
         //FragmentManager fragmentManager = getSupportFragmentManager();
         //fragmentManager.beginTransaction()
@@ -133,7 +144,7 @@ public class MainActivity extends ActionBarActivity implements
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            return true;
+        	onNavigationDrawerItemSelected(NavigationDrawerFragment.NAV_SETTINGS);
         }
         return super.onOptionsItemSelected(item);
     }

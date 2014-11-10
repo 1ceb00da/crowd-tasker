@@ -44,9 +44,14 @@
             android:name=".tasker.NewTaskActivity"
             android:label="@string/app_name"/>
         
-          <activity
+        <activity
             android:name="usc.edu.crowdtasker.location.MapPicker"
             android:label="@string/app_name"/>
+        
+        <activity
+   			android:name="usc.edu.crowdtasker.settings.SettingsActivity"
+    		android:label="@string/settings">
+</activity>
         
     </application>
 

@@ -86,7 +86,17 @@ public class TaskProvider extends DataProvider {
 	public static List<Task> getTasks(User user){
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put(Task.OWNER_ID_COL, user.getId());
-		return getTasks(new HashMap<String, Object>());
+		return getTasks(params);
+	}
+	
+	public static List<Task> getTasksRange(double location[], double radius, String unit){
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put(Task.PARAM_RANGE_LOCATION_LAT, location[0]);
+		params.put(Task.PARAM_RANGE_LOCATION_LONG, location[1]);
+		params.put(Task.PARAM_RANGE_RADIUS, radius);
+		params.put(Task.PARAM_RANGE_UNIT, unit);
+
+		return getTasks(params);
 	}
 	public static List<Task> getTasks(){
 		return getTasks(new HashMap<String, Object>());

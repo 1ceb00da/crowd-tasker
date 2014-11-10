@@ -109,12 +109,17 @@ class TaskHandler(ObjectHandler):
             sql += " WHERE "
             i = 0
             for key in params:
+                if key.startswith('PARAM_'):
+                    continue
                 sql += key + "=:" + str(i)
                 if(i < paramsLen - 1):
                     sql += " AND "
                 values = values + (params[key],)
                 i += 1
-        
+            paramsSql, paramsValues = self.convert_get_tasks_params(params, i)
+            sql += paramsSql
+            values = values + paramsValues
+    
         conn = self.conn_provider.get_db_connection()
         cursor = conn.cursor()
         cursor.execute(sql, values)
@@ -124,3 +129,25 @@ class TaskHandler(ObjectHandler):
         conn.close()
         
         return ObjectHandler.to_json(self, data)
+    
+    def convert_get_tasks_params(self, params, currIdx):
+        sql = ""
+        values = ()
+        if "PARAM_RANGE_LOCATION_LAT" in params and "PARAM_RANGE_LOCATION_LONG" in params \
+          and "PARAM_RANGE_UNIT" in params and "PARAM_RANGE_RADIUS" in params:
+           
+            unit = 'mile' if params['PARAM_RANGE_UNIT'] == 'mile' else 'km'
+            dist = str(params['PARAM_RANGE_RADIUS'])
+            
+            if currIdx > 0:
+                sql += " AND "
+            sql += " SDO_WITHIN_DISTANCE (t.PICKUP_LOC, " \
+                   "SDO_GEOMETRY(2001,8307, SDO_POINT_TYPE(:" + str(currIdx+1) + ",:" \
+                   + str(currIdx+2) + ", NULL),NULL,NULL), " \
+                   "'distance="+ dist + " unit="+unit+"') = 'TRUE'"
+            
+            values = values + (params['PARAM_RANGE_LOCATION_LAT'], \
+                     params['PARAM_RANGE_LOCATION_LONG'])
+            currIdx += 3
+            
+        return sql, values

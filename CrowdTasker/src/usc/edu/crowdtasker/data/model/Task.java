@@ -61,6 +61,12 @@ public class Task extends JSONBase{
 	private String dropoffAddress;
 	
 	private TaskStatus status;
+	
+	public static final String PARAM_RANGE_LOCATION_LAT = "PARAM_RANGE_LOCATION_LAT"; 
+	public static final String PARAM_RANGE_LOCATION_LONG = "PARAM_RANGE_LOCATION_LONG";
+	public static final String PARAM_RANGE_RADIUS = "PARAM_RANGE_RADIUS"; 
+	public static final String PARAM_RANGE_UNIT = "PARAM_RANGE_UNIT"; 
+
 
 	/**
 	 * @return the id

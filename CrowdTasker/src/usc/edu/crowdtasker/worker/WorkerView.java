@@ -9,11 +9,13 @@ import usc.edu.crowdtasker.UpdatableFragment;
 import usc.edu.crowdtasker.data.model.Task;
 import usc.edu.crowdtasker.data.provider.TaskProvider;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -55,6 +57,9 @@ public class WorkerView extends Fragment implements LocationListener,
     
     private Location currentLocation;
     
+   
+    private SharedPreferences prefs;
+    
     
     /**
      * Returns a new instance of this fragment for the given section
@@ -76,6 +81,7 @@ public class WorkerView extends Fragment implements LocationListener,
         View rootView = inflater.inflate(R.layout.worker_view, container, false);
         mapWrapper = (FrameLayout)rootView.findViewById(R.id.map_wrapper);
         mapWrapper.setVisibility(View.INVISIBLE);
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         setUpMapIfNeeded();
 
         return rootView;
@@ -134,11 +140,16 @@ public class WorkerView extends Fragment implements LocationListener,
     private void showTasksOnMap(Location currentLocation){
     	if(currentLocation == null)
     		return;
+    	final double rangeRadius = (double)prefs.getInt(getString(R.string.pref_range_radius), 10);
+        final String rangeUnit = prefs.getString(getString(R.string.pref_range_unit), "mile");
     	new AsyncTask<Location, Void, List<Task>>() {
 
 			@Override
 			protected List<Task> doInBackground(Location... params) {
-				List<Task> tasks = TaskProvider.getTasks();
+				Location location = params[0];
+				double[] latLng = new double[]{location.getLatitude(), 
+											   location.getLongitude()};
+				List<Task> tasks = TaskProvider.getTasksRange(latLng, rangeRadius, rangeUnit);
 				return tasks;
 			}
 			
@@ -171,7 +182,7 @@ public class WorkerView extends Fragment implements LocationListener,
 					mMap.addMarker(opt);*/
 				}
 			}
-		}.execute();
+		}.execute(currentLocation);
     }
 
 	@Override
@@ -263,6 +274,7 @@ public class WorkerView extends Fragment implements LocationListener,
 
 	@Override
 	public void update() {
+		
         showTasksOnMap(currentLocation);
 	}
 

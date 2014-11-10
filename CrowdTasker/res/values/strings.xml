@@ -2,6 +2,12 @@
 <resources>
 
     <string name="app_name">CrowdTasker</string>
+    <string name="settings">Settings</string>
+    
+    
+    <string name="pref_range_radius">pref_range_radius</string>
+    <string name="pref_range_unit">pref_range_unit</string>
+    
     
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -45,4 +51,11 @@
 	<string name="dropoff_loc_header">Drop off location</string>
 	<string name="dropoff">Drop off</string>
 		
+	<string name="location_range_settings">Location range settings</string>
+	<string name="location_range_settings_desc">Set the maximum radius to update data around your location.</string>
+	
+	<string name="max_load_radius">Maximum loading radius</string>
+	<string name="max_load_radius_desc">The tasks will be loaded inside given radius</string>
+	
+	
 </resources>
