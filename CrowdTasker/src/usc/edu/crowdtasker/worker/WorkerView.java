@@ -7,7 +7,9 @@ import java.util.List;
 import usc.edu.crowdtasker.R;
 import usc.edu.crowdtasker.UpdatableFragment;
 import usc.edu.crowdtasker.data.model.Task;
+import usc.edu.crowdtasker.data.model.User;
 import usc.edu.crowdtasker.data.provider.TaskProvider;
+import usc.edu.crowdtasker.data.provider.UserProvider;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -59,6 +61,7 @@ public class WorkerView extends Fragment implements LocationListener,
     
    
     private SharedPreferences prefs;
+    private User currentUser;
     
     
     /**
@@ -170,6 +173,12 @@ public class WorkerView extends Fragment implements LocationListener,
 								+ NumberFormat.getCurrencyInstance().format(task.getPayment());
 					
 					opt.snippet(snippet);
+					if(currentUser != null && task.getOwnerId() == currentUser.getId())
+						opt.icon(BitmapDescriptorFactory
+								.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+					else opt.icon(BitmapDescriptorFactory
+							.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+					
 					Marker marker = mMap.addMarker(opt);
 					taskMarkerMapping.put(marker, task);
 					
@@ -274,7 +283,7 @@ public class WorkerView extends Fragment implements LocationListener,
 
 	@Override
 	public void update() {
-		
+		currentUser = UserProvider.getCurrentUser(getActivity());
         showTasksOnMap(currentLocation);
 	}
 

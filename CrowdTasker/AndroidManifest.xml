@@ -50,8 +50,13 @@
         
         <activity
    			android:name="usc.edu.crowdtasker.settings.SettingsActivity"
-    		android:label="@string/settings">
-</activity>
+    		android:label="@string/settings" />
+        <activity
+   			android:name="usc.edu.crowdtasker.LoginActivity"
+    		android:label="@string/app_name" />
+        <activity
+   			android:name="usc.edu.crowdtasker.RegisterActivity"
+    		android:label="@string/app_name" />
         
     </application>
 

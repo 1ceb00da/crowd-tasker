@@ -3,11 +3,16 @@ package usc.edu.crowdtasker;
 import java.util.Locale;
 
 import usc.edu.crowdtasker.NavigationDrawerFragment;
+import usc.edu.crowdtasker.data.model.User;
+import usc.edu.crowdtasker.data.provider.UserProvider;
 import usc.edu.crowdtasker.settings.SettingsActivity;
 import usc.edu.crowdtasker.tasker.TaskerView;
 import usc.edu.crowdtasker.worker.WorkerView;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -44,7 +49,9 @@ public class MainActivity extends ActionBarActivity implements
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
-
+    private SharedPreferences prefs;
+    private User currentUser;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +101,15 @@ public class MainActivity extends ActionBarActivity implements
     
     @Override
     protected void onResume() {    
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        currentUser = UserProvider.getCurrentUser(getApplicationContext());
+        
+        if(currentUser == null){
+    		Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+    		startActivity(intent);
+    		finish();
+    	}	
+    	
     	mSectionsPagerAdapter.updateCurrentFragment();
     	super.onResume();
     }
@@ -106,10 +122,14 @@ public class MainActivity extends ActionBarActivity implements
 	    	case NavigationDrawerFragment.NAV_PROFILE:
 	    		break;
 	    	case NavigationDrawerFragment.NAV_SETTINGS:
-	    		Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
-	    		startActivity(intent);
+	    		Intent settingsIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+	    		startActivity(settingsIntent);
 	    		break;
 	    	case NavigationDrawerFragment.NAV_LOGOUT:
+	    		UserProvider.logoutCurrentUser(getApplicationContext());
+	    		Intent loginIntent = new Intent(getApplicationContext(), LoginActivity.class);
+	    		startActivity(loginIntent);
+	    		finish();
 	    		break;
 	    	default:
 	    		break;
@@ -145,6 +165,8 @@ public class MainActivity extends ActionBarActivity implements
         int id = item.getItemId();
         if (id == R.id.action_settings) {
         	onNavigationDrawerItemSelected(NavigationDrawerFragment.NAV_SETTINGS);
+        } else if (id == R.id.action_logout){
+        	onNavigationDrawerItemSelected(NavigationDrawerFragment.NAV_LOGOUT);
         }
         return super.onOptionsItemSelected(item);
     }

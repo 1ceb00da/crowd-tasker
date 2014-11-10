@@ -23,7 +23,7 @@ task_handler = TaskHandler(conn_handler)
 @get('/user/:action')
 @post('/user/:action')
 def user(action):
-    json_response = user_handler.do_action(action,request.body.gevalue())
+    json_response = user_handler.do_action(action,request.body.getvalue())
     return json_response
 
 @get('/task/:action')

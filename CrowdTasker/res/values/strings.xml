@@ -7,7 +7,8 @@
     
     <string name="pref_range_radius">pref_range_radius</string>
     <string name="pref_range_unit">pref_range_unit</string>
-    
+    <string name="pref_username">pref_username</string>
+    <string name="pref_userid">pref_userid</string>
     
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -57,5 +58,18 @@
 	<string name="max_load_radius">Maximum loading radius</string>
 	<string name="max_load_radius_desc">The tasks will be loaded inside given radius</string>
 	
+	<string name="username_hint">Username&#8230;</string>
+	<string name="password_hint">Password&#8230;</string>
+	<string name="username">Username</string>
+	<string name="login">Log In</string>
+	<string name="register">Register</string>
+	<string name="password_repeat_hint">Repeat password&#8230;</string>
+	<string name="email_hint">E-mail&#8230;</string>
+	<string name="login_incorrect">Username or password are incorrect</string>
 	
+	<string name="fill_required">Please fill out all required fields</string>
+	<string name="pass_dont_match">Passwords do not match</string>
+	
+	<string name="register_success">Successfully registered! Please log in.</string>
+	<string name="register_failed">Registration failed: User already exists.</string>
 </resources>
