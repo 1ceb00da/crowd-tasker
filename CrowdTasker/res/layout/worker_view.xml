@@ -12,5 +12,64 @@
 	  		android:layout_width="match_parent"
 	  		android:layout_height="match_parent"
 	  		class="com.google.android.gms.maps.SupportMapFragment"/>
+	    
+	    
+	    
+    <LinearLayout
+        android:id="@+id/task_details_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:visibility="gone"
+         >
+        
+        <TextView
+            android:id="@+id/taskHeading"
+            android:layout_marginLeft="5sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Task Heading"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:orientation="horizontal" >
+            
+            <TextView
+                android:id="@+id/taskDetails"
+                android:layout_marginLeft="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Task Details"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+		</LinearLayout>
+		<LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:orientation="horizontal" >
+          
+            <Button
+                android:id="@+id/accpetTaskBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/button1"
+                android:text="Accept" />
+
+            <Button
+                android:id="@+id/declineTaskBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Decline" />
+
+        </LinearLayout>
+    </LinearLayout>
     </FrameLayout>
 </RelativeLayout>
