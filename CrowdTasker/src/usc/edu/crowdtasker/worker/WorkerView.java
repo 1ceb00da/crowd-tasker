@@ -20,6 +20,7 @@ import usc.edu.crowdtasker.R;
 import usc.edu.crowdtasker.UpdatableFragment;
 import usc.edu.crowdtasker.data.model.Task;
 import usc.edu.crowdtasker.data.model.User;
+import usc.edu.crowdtasker.data.provider.RouteProvider;
 import usc.edu.crowdtasker.data.provider.TaskProvider;
 import usc.edu.crowdtasker.data.provider.UserProvider;
 import android.content.Context;
@@ -82,12 +83,15 @@ public class WorkerView extends Fragment implements LocationListener,
     private Marker openDropoffMarker;
     
     private Location currentLocation;
-    
+	private Polyline currentRoutePoly;
    
     private SharedPreferences prefs;
     private User currentUser;
-    
-    
+ 	private Task currentTask;
+ 	
+ 	
+ 	private Button acceptBtn;
+ 	private Button declineBtn;
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -111,7 +115,9 @@ public class WorkerView extends Fragment implements LocationListener,
         mapWrapper.setVisibility(View.INVISIBLE);
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         setUpMapIfNeeded();
-
+        
+        acceptBtn = (Button) rootView.findViewById(R.id.accpetTaskBtn);
+        declineBtn = (Button) rootView.findViewById(R.id.declineTaskBtn);
         return rootView;
     }
     
@@ -270,7 +276,7 @@ public class WorkerView extends Fragment implements LocationListener,
 	}
 	
 	private void showTaskDetailsPanel(Task task) {
-		this.task = task;
+		this.currentTask = task;
 		final LinearLayout taskPanel = (LinearLayout) rootView.findViewById(R.id.task_details_panel);
 		String directions;
 		taskPanel.setVisibility(View.VISIBLE);
@@ -280,10 +286,7 @@ public class WorkerView extends Fragment implements LocationListener,
 		
 		taskheading.setText(task.getName());
 		taskDetails.setText(task.getDescription());
-		
-		Button acceptBtn = (Button) mapWrapper.findViewById(R.id.accpetTaskBtn);
-		Button declineBtn = (Button) mapWrapper.findViewById(R.id.declineTaskBtn);
-		
+				
 		acceptBtn.setOnClickListener(this);
 		declineBtn.setOnClickListener(new OnClickListener() {
 			
@@ -296,68 +299,22 @@ public class WorkerView extends Fragment implements LocationListener,
 		
 	}
 	
-	private PolylineOptions POLYLINES;
 
-	private void updateMap(String result2) {
-		try {
-			JSONObject json = new JSONObject(result2);
-			JSONArray routeArray = json.getJSONArray("routes");
-			
-			JSONObject routes = routeArray.getJSONObject(0);
-			JSONObject polylines = routes.getJSONObject("overview_polyline");
-			
-            String encodedString = polylines.getString("points");
-            List<LatLng> list = decodePoly(encodedString);
-            
-            PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
-            for (int z = 0; z < list.size(); z++) {
-                LatLng point = list.get(z);
-                options.add(point);
-            }
-            POLYLINES = options;
-            mMap.addPolyline(options);
-            		
-			
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		
-		
-	}
-
-	private List<LatLng> decodePoly(String encoded) {
-
-		List<LatLng> poly = new ArrayList<LatLng>();
-        int index = 0, len = encoded.length();
-        int lat = 0, lng = 0;
- 
-        while (index < len) {
-            int b, shift = 0, result = 0;
-            do {
-                b = encoded.charAt(index++) - 63;
-                result |= (b & 0x1f) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lat += dlat;
- 
-            shift = 0;
-            result = 0;
-            do {
-                b = encoded.charAt(index++) - 63;
-                result |= (b & 0x1f) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lng += dlng;
- 
-            LatLng p = new LatLng((((double) lat / 1E5)),
-                        (((double) lng / 1E5)));
-            poly.add(p);
+	private void showRoute( List<LatLng> routePoints) {
+        if (currentRoutePoly != null)
+        	currentRoutePoly.remove();
+        
+        PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
+        for (int z = 0; z < routePoints.size(); z++) {
+            LatLng point = routePoints.get(z);
+            options.add(point);
         }
- 
-        return poly;
+        //POLYLINES = options;
+        currentRoutePoly = mMap.addPolyline(options);
+            			
 	}
+
+	
 
 	private void fitToOpenMarkers(){
 		if(openPickupMarker == null)
@@ -386,42 +343,52 @@ public class WorkerView extends Fragment implements LocationListener,
 			openDropoffMarker = null;
 		}
 	}
-    
-
-
-	private Task task;
-	private String result = "";  
-	private String directions;
+ 
 	@Override
 	public void onClick(View v) {
-		String pickUp = task.getPickupAddress();
-		String dropOff = task.getDropoffAddress();
+		if (v.getId() == acceptBtn.getId()) {
+			currentTask.setStatus(Task.TaskStatus.ACCEPTED);
+			currentTask.setWorkerId(currentUser.getId());
+			
+			Log.d(TAG, currentTask.toString());
+			
+			new AsyncTask<Task, Void, Boolean>() {
+
+				@Override
+				protected Boolean doInBackground(Task... params) {
+					return TaskProvider.updateTask(params[0]);
+				}
+				
+				@Override
+				protected void onPostExecute(Boolean result) {
+					if (result) {
+						// Show task accept panel
+						// panle has timer, 
+						// get time to deadline form db
+						
+					}
+				};
+				
+			}.execute(currentTask);
+			
+		}
+		String pickUp = currentTask.getPickupAddress();
+		String dropOff = currentTask.getDropoffAddress();
 
 		
-		String url = "https://maps.googleapis.com/maps/api/directions/json?"
-				+ "origin=" + Uri.encode(pickUp) +"&"
-				+"destination="+ Uri.encode(dropOff ) + "&"
-				+ "mode=walking"; 
-		Log.d("RESTCALL",url);
-		
-		callWebService(url); 
-		this.directions = result;
-		updateMap(result);
+		new AsyncTask<String, Void, List<LatLng>>(){
+			@Override
+			protected  List<LatLng> doInBackground(String... params) {
+				return RouteProvider.getRoute(params[0], params[1]); 
+			}
+			@Override
+			protected void onPostExecute(List<LatLng> result) {
+				showRoute(result);
+			}
+		}.execute(pickUp, dropOff);
 	}
-	 public void callWebService(String url){  
-	        HttpClient httpclient = new DefaultHttpClient();  
-	        HttpGet request = new HttpGet(url);  
-	        ResponseHandler<String> handler = new BasicResponseHandler();  
-	        try {  
-	            result = httpclient.execute(request, handler);  
-	        } catch (ClientProtocolException e) {  
-	            e.printStackTrace();  
-	        } catch (IOException e) {  
-	            e.printStackTrace();  
-	        }  
-	        httpclient.getConnectionManager().shutdown();   
-	        Log.i("RESTCALL", result);  
-	    } // end callWebService()  
+	
+	
 		@Override
 		public void onProviderDisabled(String provider) {		
 		}

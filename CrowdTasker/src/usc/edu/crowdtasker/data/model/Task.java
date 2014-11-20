@@ -60,6 +60,7 @@ public class Task extends JSONBase{
 	public static final String DROPOFF_ADDRESS_COL = "DROPOFF_ADDR";
 	private String dropoffAddress;
 	
+	public static final String STATUS_COL = "STATUS";
 	private TaskStatus status;
 	
 	public static final String PARAM_RANGE_LOCATION_LAT = "PARAM_RANGE_LOCATION_LAT"; 
@@ -243,6 +244,9 @@ public class Task extends JSONBase{
 			
 			result.put(PICKUP_ADDRESS_COL, pickupAddress);
 			result.put(DROPOFF_ADDRESS_COL, dropoffAddress);
+			
+			if(status != null)
+				result.put(STATUS_COL, status.name());
 			return result;
 			
 		} catch (JSONException e) {
@@ -288,6 +292,10 @@ public class Task extends JSONBase{
 			
 			if(!jsonObject.isNull(DROPOFF_ADDRESS_COL))
 				setDropoffAddress(jsonObject.getString(DROPOFF_ADDRESS_COL));
+			
+			if(!jsonObject.isNull(STATUS_COL))
+				setStatus(TaskStatus.valueOf(jsonObject.getString(STATUS_COL)));
+			
 		} catch (JSONException e) {
 			Log.e(TAG, "fromJSON JSONException: " + e.getMessage());
 			return false;

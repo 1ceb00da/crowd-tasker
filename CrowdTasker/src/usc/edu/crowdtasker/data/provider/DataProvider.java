@@ -9,8 +9,11 @@ import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -96,4 +99,21 @@ public class DataProvider {
 		}
 		return null;
 	}
+	
+	public static String callWebService(String url){
+		String result = "";
+        HttpClient httpclient = new DefaultHttpClient();  
+        HttpGet request = new HttpGet(url);  
+        ResponseHandler<String> handler = new BasicResponseHandler();  
+        try {  
+            result = httpclient.execute(request, handler);  
+        } catch (ClientProtocolException e) {  
+            e.printStackTrace();  
+        } catch (IOException e) {  
+            e.printStackTrace();  
+        }  
+        httpclient.getConnectionManager().shutdown();   
+        Log.i("RESTCALL", result);  
+        return result;
+	 } // end callWebService()  
 }
