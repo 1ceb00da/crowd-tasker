@@ -17,6 +17,7 @@ public class SettingsActivity extends PreferenceActivity {
     @Override
     protected boolean isValidFragment(String fragmentName)
     {
-        return LocationRangeSettings.class.getName().equals(fragmentName);
+        return LocationRangeSettings.class.getName().equals(fragmentName)
+        	|| NearestTasksSettings.class.getName().equals(fragmentName);
     }
 }

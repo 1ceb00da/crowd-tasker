@@ -67,6 +67,7 @@ public class Task extends JSONBase{
 	public static final String PARAM_RANGE_LOCATION_LONG = "PARAM_RANGE_LOCATION_LONG";
 	public static final String PARAM_RANGE_RADIUS = "PARAM_RANGE_RADIUS"; 
 	public static final String PARAM_RANGE_UNIT = "PARAM_RANGE_UNIT"; 
+	public static final String PARAM_NEAREST_TASKS = "PARAM_NEAREST_TASKS"; 
 
 
 	/**

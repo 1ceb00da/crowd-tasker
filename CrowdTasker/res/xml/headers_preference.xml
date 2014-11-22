@@ -4,5 +4,9 @@
     <header android:fragment="usc.edu.crowdtasker.settings.LocationRangeSettings"
             android:title="@string/location_range_settings"
             android:summary="@string/location_range_settings_desc" />
+    
+      <header android:fragment="usc.edu.crowdtasker.settings.NearestTasksSettings"
+            android:title="@string/nearest_tasks_settings"
+            android:summary="@string/nearest_tasks_settings_desc" />
 
 </preference-headers>

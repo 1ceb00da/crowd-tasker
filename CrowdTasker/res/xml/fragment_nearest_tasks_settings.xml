@@ -2,24 +2,25 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:usc="http://usc.edu">
 
-    <PreferenceCategory android:title="@string/max_load_radius">
+    <PreferenceCategory android:title="@string/max_nearest_tasks">
 
         <!-- <CheckBoxPreference
             android:key="checkBoxPref"
             android:title="check it out"
             android:summary="click this litle box"/>
          -->
+       
          <usc.edu.crowdtasker.settings.SeekBarPreference
-            android:key="@string/pref_range_radius"
+            android:key="@string/pref_nearest_tasks"
             android:title=""
-            android:summary="@string/max_load_radius_desc"
+            android:summary="@string/max_nearest_tasks_desc"
             android:defaultValue="10"
             usc:max="50"
             usc:min="1"
             usc:unitsLeft=""
-            usc:unitsRight=" mi"
+            usc:unitsRight=""
           />
-         
+
     </PreferenceCategory>
 
 </PreferenceScreen>

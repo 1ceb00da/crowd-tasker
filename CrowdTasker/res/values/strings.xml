@@ -7,6 +7,7 @@
     
     <string name="pref_range_radius">pref_range_radius</string>
     <string name="pref_range_unit">pref_range_unit</string>
+    <string name="pref_nearest_tasks">pref_nearest_tasks</string>
     <string name="pref_username">pref_username</string>
     <string name="pref_userid">pref_userid</string>
     
@@ -55,8 +56,14 @@
 	<string name="location_range_settings">Location range settings</string>
 	<string name="location_range_settings_desc">Set the maximum radius to update data around your location.</string>
 	
+	<string name="nearest_tasks_settings">Nearest tasks settings</string>
+	<string name="nearest_tasks_settings_desc">Set the maximum number of nearest tasks to show around your location.</string>
+	
 	<string name="max_load_radius">Maximum loading radius</string>
-	<string name="max_load_radius_desc">The tasks will be loaded inside given radius</string>
+	<string name="max_load_radius_desc">The tasks will be loaded inside the given radius</string>
+
+	<string name="max_nearest_tasks">Maximum number of nearest tasks</string>
+	<string name="max_nearest_tasks_desc">At most the given number of tasks will be loaded around your location</string>
 	
 	<string name="username_hint">Username&#8230;</string>
 	<string name="password_hint">Password&#8230;</string>

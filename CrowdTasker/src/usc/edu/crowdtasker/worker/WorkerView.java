@@ -1,26 +1,13 @@
 package usc.edu.crowdtasker.worker;
 
-import java.io.IOException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import usc.edu.crowdtasker.R;
 import usc.edu.crowdtasker.UpdatableFragment;
 import usc.edu.crowdtasker.data.model.Task;
 import usc.edu.crowdtasker.data.model.User;
-import usc.edu.crowdtasker.data.provider.RouteProvider;
 import usc.edu.crowdtasker.data.provider.TaskProvider;
 import usc.edu.crowdtasker.data.provider.UserProvider;
 import android.content.Context;
@@ -29,20 +16,15 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebView.FindListener;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -61,6 +43,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import usc.edu.crowdtasker.data.provider.RouteProvider;
 
 
 public class WorkerView extends Fragment implements LocationListener, 
@@ -177,6 +160,8 @@ public class WorkerView extends Fragment implements LocationListener,
     		return;
     	final double rangeRadius = (double)prefs.getInt(getString(R.string.pref_range_radius), 10);
         final String rangeUnit = prefs.getString(getString(R.string.pref_range_unit), "mile");
+        final int numNearestTasks = prefs.getInt(getString(R.string.pref_nearest_tasks), 10);
+        
     	new AsyncTask<Location, Void, List<Task>>() {
 
 			@Override
@@ -184,7 +169,8 @@ public class WorkerView extends Fragment implements LocationListener,
 				Location location = params[0];
 				double[] latLng = new double[]{location.getLatitude(), 
 											   location.getLongitude()};
-				List<Task> tasks = TaskProvider.getTasksRange(latLng, rangeRadius, rangeUnit);
+				List<Task> tasks = TaskProvider.getTasksRange(latLng, rangeRadius, 
+						rangeUnit, numNearestTasks);
 				return tasks;
 			}
 			
