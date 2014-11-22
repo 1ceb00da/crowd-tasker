@@ -89,12 +89,17 @@ public class TaskProvider extends DataProvider {
 		return getTasks(params);
 	}
 	
-	public static List<Task> getTasksRange(double location[], double radius, String unit){
+	public static List<Task> getTasksRange(double location[], Double radius, 
+			String unit, Integer numNearestTasks){
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put(Task.PARAM_RANGE_LOCATION_LAT, location[0]);
 		params.put(Task.PARAM_RANGE_LOCATION_LONG, location[1]);
-		params.put(Task.PARAM_RANGE_RADIUS, radius);
-		params.put(Task.PARAM_RANGE_UNIT, unit);
+		if(radius != null)
+			params.put(Task.PARAM_RANGE_RADIUS, radius);
+		if(unit != null)
+			params.put(Task.PARAM_RANGE_UNIT, unit);
+		if(numNearestTasks != null)
+			params.put(Task.PARAM_NEAREST_TASKS, numNearestTasks);
 
 		return getTasks(params);
 	}

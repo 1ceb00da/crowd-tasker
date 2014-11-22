@@ -133,21 +133,36 @@ class TaskHandler(ObjectHandler):
     def convert_get_tasks_params(self, params, currIdx):
         sql = ""
         values = ()
-        if "PARAM_RANGE_LOCATION_LAT" in params and "PARAM_RANGE_LOCATION_LONG" in params \
-          and "PARAM_RANGE_UNIT" in params and "PARAM_RANGE_RADIUS" in params:
+        if "PARAM_RANGE_LOCATION_LAT" in params and "PARAM_RANGE_LOCATION_LONG" in params:
+            if "PARAM_RANGE_UNIT" in params and "PARAM_RANGE_RADIUS" in params:
            
-            unit = 'mile' if params['PARAM_RANGE_UNIT'] == 'mile' else 'km'
-            dist = str(params['PARAM_RANGE_RADIUS'])
-            
-            if currIdx > 0:
-                sql += " AND "
-            sql += " SDO_WITHIN_DISTANCE (t.PICKUP_LOC, " \
-                   "SDO_GEOMETRY(2001,8307, SDO_POINT_TYPE(:" + str(currIdx+1) + ",:" \
-                   + str(currIdx+2) + ", NULL),NULL,NULL), " \
-                   "'distance="+ dist + " unit="+unit+"') = 'TRUE'"
-            
-            values = values + (params['PARAM_RANGE_LOCATION_LAT'], \
-                     params['PARAM_RANGE_LOCATION_LONG'])
-            currIdx += 3
+                unit = 'mile' if params['PARAM_RANGE_UNIT'] == 'mile' else 'km'
+                dist = str(params['PARAM_RANGE_RADIUS'])
+                
+                if currIdx > 0:
+                    sql += " AND "
+                sql += " SDO_WITHIN_DISTANCE (t.PICKUP_LOC, " \
+                       "SDO_GEOMETRY(2001,8307, SDO_POINT_TYPE(:" + str(currIdx+1) + ",:" \
+                       + str(currIdx+2) + ", NULL),NULL,NULL), " \
+                       "'distance="+ dist + " unit="+unit+"') = 'TRUE'"
+                
+                values = values + (params['PARAM_RANGE_LOCATION_LAT'], \
+                         params['PARAM_RANGE_LOCATION_LONG'])
+                currIdx += 2
+                
+            if "PARAM_NEAREST_TASKS" in params:
+                
+                knn = str(params['PARAM_NEAREST_TASKS'])
+
+                if currIdx > 0:
+                    sql += " AND "
+                sql += " SDO_NN(t.PICKUP_LOC, " \
+                       "SDO_GEOMETRY(2001,8307, SDO_POINT_TYPE(:" + str(currIdx+1) + ",:" \
+                       + str(currIdx+2) + ", NULL),NULL,NULL), " \
+                       "'sdo_num_res="+knn+"') = 'TRUE'"
+                       
+                values = values + (params['PARAM_RANGE_LOCATION_LAT'], \
+                         params['PARAM_RANGE_LOCATION_LONG'])
+                currIdx += 2
             
         return sql, values
