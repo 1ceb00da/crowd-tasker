@@ -24,6 +24,7 @@
     <string name="worker">Worker</string>
     <string name="worker_semicolon">Worker:</string>
     <string name="tasker">Tasker</string>
+    <string name="tasker_semicolon">Tasker:</string>
     <string name="new_task">New Task</string>
     <string name="edit_task">Edit Task</string>
     

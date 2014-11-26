@@ -2,73 +2,148 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    
-    <FrameLayout  
+
+    <FrameLayout
+        android:id="@+id/map_wrapper"
         android:layout_width="match_parent"
-    	android:layout_height="match_parent"
-    	android:id="@+id/map_wrapper">
-	    <fragment 
-	 		android:id="@+id/map"
-	  		android:layout_width="match_parent"
-	  		android:layout_height="match_parent"
-	  		class="com.google.android.gms.maps.SupportMapFragment"/>
-	    
-	    
-	    
-    <LinearLayout
-        android:id="@+id/task_details_panel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:background="@android:color/white"
-        android:orientation="vertical"
-        android:visibility="gone"
-         >
-        
-        <TextView
-            android:id="@+id/taskHeading"
-            android:layout_marginLeft="5sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Task Heading"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"/>
-        
+        android:layout_height="match_parent" >
+
+        <fragment
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            class="com.google.android.gms.maps.SupportMapFragment" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/task_details_panel"
+            android:layout_width="500sp"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
-            android:orientation="horizontal" >
+            android:layout_gravity="bottom|center"
+            android:background="@android:color/background_light"
+            android:orientation="horizontal"
+            android:visibility="gone"
+		    android:padding="10dp"
+		    android:paddingTop="5dp" >
+            
+        <LinearLayout 
+            android:id="@+id/left_panel"
+            android:layout_weight="1"
+            android:layout_alignParentLeft="true"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
             
             <TextView
-                android:id="@+id/taskDetails"
-                android:layout_marginLeft="5dp"
+                android:id="@+id/taskName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Task Details"
-                />
-		</LinearLayout>
-		<LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/white"
-            android:orientation="horizontal" >
-          
-            <Button
-                android:id="@+id/accpetTaskBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/button1"
-                android:text="Accept" />
+                android:layout_marginBottom="5dp"
+                android:text="@string/task"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/declineTaskBtn"
+            <TextView
+                android:id="@+id/taskDescription"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:text="@string/description" />
+
+            <LinearLayout
+                android:id="@+id/deadline_wrapper"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Decline" />
+                android:layout_alignParentLeft="true"
+                android:layout_marginBottom="3dp"
+                android:orientation="horizontal" >
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="3dp"
+                    android:text="@string/deadline"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/deadline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/payment_wrapper"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/deadline_wrapper"
+                android:layout_marginBottom="3dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="3dp"
+                    android:text="@string/payment"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/payment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tasker_wrapper"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginBottom="3dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="3dp"
+                    android:text="@string/tasker_semicolon"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tasker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:orientation="horizontal" >
+            </LinearLayout>
+            
         </LinearLayout>
-    </LinearLayout>
+            
+            <LinearLayout
+                android:id="@+id/right_panel"
+                android:layout_weight="1"
+                android:layout_gravity="right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/accpetTaskBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/button1"
+                    android:text="Accept" />
+
+                <Button
+                    android:id="@+id/declineTaskBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Decline" />
+            </LinearLayout>
+        </LinearLayout>
     </FrameLayout>
+
 </RelativeLayout>

@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -43,6 +44,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+
 import usc.edu.crowdtasker.data.provider.RouteProvider;
 
 
@@ -267,11 +269,11 @@ public class WorkerView extends Fragment implements LocationListener,
 		String directions;
 		taskPanel.setVisibility(View.VISIBLE);
 		
-		TextView taskheading = (TextView) mapWrapper.findViewById(R.id.taskHeading);
-		TextView taskDetails = (TextView) mapWrapper.findViewById(R.id.taskDetails);
+		TextView taskName = (TextView) mapWrapper.findViewById(R.id.taskName);
+		TextView taskDescription = (TextView) mapWrapper.findViewById(R.id.taskDescription);
 		
-		taskheading.setText(task.getName());
-		taskDetails.setText(task.getDescription());
+		taskName.setText(task.getName());
+		taskDescription.setText(task.getDescription());
 				
 		acceptBtn.setOnClickListener(this);
 		declineBtn.setOnClickListener(new OnClickListener() {
@@ -324,6 +326,8 @@ public class WorkerView extends Fragment implements LocationListener,
 
 	@Override
 	public void onMapClick(LatLng latLng) {
+		// hide task details panel
+		mapWrapper.findViewById(R.id.task_details_panel).setVisibility(View.GONE);
 		if(openDropoffMarker != null){
 			openDropoffMarker.remove();
 			openDropoffMarker = null;
@@ -350,7 +354,7 @@ public class WorkerView extends Fragment implements LocationListener,
 					if (result) {
 						// Show task accept panel
 						// panle has timer, 
-						// get time to deadline form db
+						// get time to deadline from db
 						
 					}
 				};
