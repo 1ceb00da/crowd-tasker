@@ -10,6 +10,7 @@ import java.util.TimeZone;
 import usc.edu.crowdtasker.R;
 import usc.edu.crowdtasker.data.model.Task;
 import usc.edu.crowdtasker.data.model.User;
+import usc.edu.crowdtasker.data.model.Task.TaskStatus;
 import usc.edu.crowdtasker.data.provider.TaskProvider;
 import usc.edu.crowdtasker.data.provider.UserProvider;
 import usc.edu.crowdtasker.location.MapPicker;
@@ -63,7 +64,7 @@ public class NewTaskActivity extends Activity {
        super.onCreate(savedInstanceState);    
        setContentView(R.layout.new_task_view);
        
-       dateFormat = DateFormat.getDateTimeInstance();
+       dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,DateFormat.SHORT);
 	   moneyFormat = NumberFormat.getInstance();
        
 	   headerTitleTv = (TextView) findViewById(R.id.new_task_header_title);
@@ -106,7 +107,7 @@ public class NewTaskActivity extends Activity {
     	   }.execute(extras.getLong(Task.ID_COL));
        }
        
-       deadlineEt.setOnClickListener( new OnClickListener() {
+       deadlineEt.setOnClickListener(new OnClickListener() {
 		
 			@Override
 			public void onClick(View v) {
@@ -265,6 +266,7 @@ public class NewTaskActivity extends Activity {
 			}
     	}else currentTask.setPayment(null);
     	
+    	currentTask.setStatus(TaskStatus.CREATED);
     	new AsyncTask<Void, Void, Boolean>() {
 
 			@Override

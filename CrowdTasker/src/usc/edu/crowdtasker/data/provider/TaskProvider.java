@@ -117,5 +117,29 @@ public class TaskProvider extends DataProvider {
 		
 		return null;
 	}
+	
+	public static boolean deleteTask(long taskId){
+		try {
+			HashMap<String, Object> params = new HashMap<String, Object>();
+			params.put(Task.ID_COL, taskId);
+			
+			JSONObject jsonParams = createJSONParams(params);
+			
+			JSONArray tasksJson = performRequest(Task.ENTITY_NAME, DELETE, jsonParams);
+			if(tasksJson == null)
+				return false;
+			
+			for(int i = 0; i < tasksJson.length(); i++){
+				JSONObject resultJson = tasksJson.getJSONObject(i);
+				String result = resultJson.getString(RESULT);
+				if(!result.equals(RESULT_OK))
+					return false;
+			}
+		} catch (JSONException e) {
+			Log.e(TAG, "JSONException: " + e.getMessage());
+			return false;
+		} 
+		return true;
+	}
 
 }

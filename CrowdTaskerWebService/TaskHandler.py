@@ -13,6 +13,8 @@ class TaskHandler(ObjectHandler):
             return self.create_task(jsonParams)
         elif action == 'update':
             return self.update_task(jsonParams)
+        elif action == 'delete':
+            return self.delete_task(jsonParams)
         else:
             return ""
         
@@ -166,3 +168,20 @@ class TaskHandler(ObjectHandler):
                 currIdx += 2
             
         return sql, values
+    
+    
+    def delete_task(self,params):
+        if "ID" not in params:
+            return ObjectHandler.FAIL_JSON
+        
+        sql = "DELETE FROM TASKS WHERE ID=:1"
+        values = (params.get('ID',None),)
+        
+        conn = self.conn_provider.get_db_connection()
+        cursor = conn.cursor()
+        r = cursor.execute(sql, values)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return ObjectHandler.OK_JSON

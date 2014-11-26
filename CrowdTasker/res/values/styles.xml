@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
@@ -22,4 +22,38 @@
         <item name="android:background">#3f51b5</item>
     </style>
      -->
+    <style name="StatusFont">
+        <item name="android:layout_width">72dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:typeface">monospace</item>
+        <item name="android:capitalize">characters</item>
+        <item name="android:padding">5dp</item>   
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+    <style name="StatusCreated" parent="@style/StatusFont">
+        <item name="android:background">@drawable/rounded_corner_grey</item>
+        <item name="android:text">CREATED</item>
+    </style>
+    
+    <style name="StatusAccepted" parent="@style/StatusFont">
+        <item name="android:background">@drawable/rounded_corner_yellow</item>
+        <item name="android:text">ACCEPTED</item>
+    </style>
+    
+     <style name="StatusCompleted" parent="@style/StatusFont">
+        <item name="android:background">@drawable/rounded_corner_green</item>
+        <item name="android:text">COMPLETED</item>
+     </style>
+    
+     <style name="StatusCanceled" parent="@style/StatusFont">
+        <item name="android:background">@drawable/rounded_corner_red</item>
+        <item name="android:text">CANCELED</item>
+     </style>
+    
+     
+
 </resources>

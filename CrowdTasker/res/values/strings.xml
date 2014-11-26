@@ -22,6 +22,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     
     <string name="worker">Worker</string>
+    <string name="worker_semicolon">Worker:</string>
     <string name="tasker">Tasker</string>
     <string name="new_task">New Task</string>
     <string name="edit_task">Edit Task</string>
@@ -79,4 +80,31 @@
 	
 	<string name="register_success">Successfully registered! Please log in.</string>
 	<string name="register_failed">Registration failed: User already exists.</string>
+	
+	<string name="task_status_changed">Task status changed</string>
+	<string name="task_status_changed_msg">The status of the task \'%1$s\' has changed to \'%2$s\'</string>
+	<string name="details">Details</string>
+	
+	<string name="task">Task</string>
+	<string name="payment">Payment:</string>
+	<string name="deadline">Deadline:</string>
+	<string name="dropoff_loc">Drop-off location</string>
+	<string name="pickup_loc">Pick-up location</string>
+	<string name="description">Description</string>
+	
+	<string name="not_assigned">Not assigned</string>
+	
+	<string name="action_edit_task">Edit task</string>
+	<string name="action_delete_task">Delete task</string>
+	
+	<string name="delete_task_dialog_title">Delete task</string>
+	<string name="delete_task_dialog_msg">Are you sure you want to delete this task?</string>
+	<string name="delete_task_dialog_cancel">The task cannot be deleted as it has been accepted by a worker. Do you want to cancel the task instead?</string>
+	
+	<string name="task_delete_success">Task successfully deleted</string>
+	<string name="task_delete_error">Task could not be deleted</string>
+	
+	<string name="task_cancel_success">Task successfully canceled</string>
+	<string name="task_cancel_error">Task could not be canceled</string>
+	
 </resources>

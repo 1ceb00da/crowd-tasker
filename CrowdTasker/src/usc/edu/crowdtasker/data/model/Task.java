@@ -20,7 +20,7 @@ public class Task extends JSONBase{
 		CREATED, 
 		ACCEPTED, 
 		COMPLETED, 
-		CANCELLED
+		CANCELED
 	}
 	
 	public static final String ENTITY_NAME = "task";

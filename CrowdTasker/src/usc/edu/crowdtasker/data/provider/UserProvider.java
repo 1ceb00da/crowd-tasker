@@ -95,6 +95,17 @@ public class UserProvider extends DataProvider {
 		return true;
 	}
 	
+	public static User getUserById(Long id){
+		if(id == null)
+			return null;
+		HashMap<String,Object> params = new HashMap<String, Object>();
+		params.put(User.ID_COL, id);
+		List<User> result = getUsers(params);
+		if(result != null && result.size() > 0)
+			return result.get(0);
+		return null;
+	}
+	
 	public static User getCurrentUser(Context context){
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		User user = new User();

@@ -1,5 +1,8 @@
 package usc.edu.crowdtasker.tasker;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import usc.edu.crowdtasker.R;
 import usc.edu.crowdtasker.UpdatableFragment;
 import usc.edu.crowdtasker.data.model.Task;
@@ -26,11 +29,14 @@ import android.widget.ListView;
  */
 public class TaskerView extends Fragment implements UpdatableFragment{
 
+	public static final int UPDATE_INTERVAL = 10000; // Update interval in milliseconds
+	
 	private ListView taskListView;
 	private TaskListAdapter taskListAdapter;
 	private Button newTaskBtn;
 	
 	private User currentUser;
+	private Timer updateTimer;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -64,27 +70,57 @@ public class TaskerView extends Fragment implements UpdatableFragment{
 					long id) {
 				Task task = (Task)parent.getAdapter().getItem(position);
 				if(task != null){
-					Intent editTaskIntent = new Intent(getActivity(), NewTaskActivity.class);
-					editTaskIntent.putExtra(Task.ID_COL, task.getId());
-					startActivity(editTaskIntent); 
+					Intent taskStatusIntent = new Intent(getActivity(), TaskStatusActivity.class);
+					taskStatusIntent.putExtra(Task.ID_COL, task.getId());
+					if(updateTimer != null)
+						updateTimer.cancel();
+					startActivity(taskStatusIntent); 
 				}
 			}
 		});
+        
         update();
+	  
+      
         newTaskBtn = (Button)(rootView.findViewById(R.id.new_task_btn));
         newTaskBtn.setOnClickListener(new OnClickListener () {
 			@Override
-			public void onClick(View arg0) {
+			public void onClick(View v) {
 				Intent newTaskIntent = new Intent(getActivity(), NewTaskActivity.class);
+				if(updateTimer != null)
+					updateTimer.cancel();
 				startActivity(newTaskIntent);
 			}
 		});
         
         return rootView;
     }
+    
+    @Override
+    public void onDestroyView() {
+    	updateTimer.cancel();
+    	super.onDestroyView();
+    }
 
 	@Override
 	public void update() {
-		taskListAdapter.updateTasks();
+//		if(taskListAdapter != null)
+//			taskListAdapter.clearTaskStatuses();
+		if(updateTimer != null){
+        	updateTimer.cancel();
+        	updateTimer.purge();
+        }
+        
+        // Update tasks regularly
+	    updateTimer = new Timer();
+		  // Set the schedule function and rate
+	    updateTimer.scheduleAtFixedRate(new TimerTask() {
+		    @Override
+		    public void run() {
+		    	taskListAdapter.updateTasks();
+		    }
+	    },
+	    0, // Set how long before to start calling the TimerTask (in milliseconds)
+	    UPDATE_INTERVAL); // Set the amount of time between each execution (in milliseconds)		
 	}
 }
