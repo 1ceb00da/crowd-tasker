@@ -454,6 +454,8 @@ public class WorkerView extends Fragment implements LocationListener,
 		currentTask.setStatus(Task.TaskStatus.ACCEPTED);
 		currentTask.setWorkerId(currentUser.getId());
 		
+		currentTask.setWorkerLocation(new double[]
+				{currentLocation.getLatitude(), currentLocation.getLongitude()});
 		Log.d(TAG , "accpeted a task");
 
 		new AsyncTask<Task, Void, Boolean>() {

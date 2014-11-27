@@ -68,6 +68,11 @@ public class Task extends JSONBase{
 	public static final String PARAM_RANGE_RADIUS = "PARAM_RANGE_RADIUS"; 
 	public static final String PARAM_RANGE_UNIT = "PARAM_RANGE_UNIT"; 
 	public static final String PARAM_NEAREST_TASKS = "PARAM_NEAREST_TASKS"; 
+	
+	public static final String WORKER_LOC_LAT_COL = "WORKER_LOC_LAT";
+	public static final String WORKER_LOC_LONG_COL = "WORKER_LOC_LONG";
+	private double[] workerLocation;
+
 
 
 	/**
@@ -203,6 +208,18 @@ public class Task extends JSONBase{
 		this.dropoffAddress = dropoffAddress;
 	}
 	/**
+	 * @return the workerLocation
+	 */
+	public double[] getWorkerLocation() {
+		return workerLocation;
+	}
+	/**
+	 * @param workerLocation the workerLocation to set
+	 */
+	public void setWorkerLocation(double[] workerLocation) {
+		this.workerLocation = workerLocation;
+	}
+	/**
 	 * @return the status
 	 */
 	public TaskStatus getStatus() {
@@ -246,6 +263,11 @@ public class Task extends JSONBase{
 			result.put(PICKUP_ADDRESS_COL, pickupAddress);
 			result.put(DROPOFF_ADDRESS_COL, dropoffAddress);
 			
+			if(workerLocation != null){
+				result.put(WORKER_LOC_LAT_COL, workerLocation[0]);
+				result.put(WORKER_LOC_LONG_COL, workerLocation[1]);
+			}
+			
 			if(status != null)
 				result.put(STATUS_COL, status.name());
 			return result;
@@ -288,6 +310,11 @@ public class Task extends JSONBase{
 			if(!jsonObject.isNull(DROPOFF_LAT_COL) && !jsonObject.isNull(DROPOFF_LONG_COL))
 				setDropoffLocation(new double[]{jsonObject.getDouble(DROPOFF_LAT_COL),
 						jsonObject.getDouble(DROPOFF_LONG_COL)});
+			
+			if(!jsonObject.isNull(WORKER_LOC_LAT_COL) && !jsonObject.isNull(WORKER_LOC_LONG_COL))
+				setWorkerLocation(new double[]{jsonObject.getDouble(WORKER_LOC_LAT_COL),
+						jsonObject.getDouble(WORKER_LOC_LONG_COL)});
+			
 			if(!jsonObject.isNull(PICKUP_ADDRESS_COL))
 				setPickupAddress(jsonObject.getString(PICKUP_ADDRESS_COL));
 			

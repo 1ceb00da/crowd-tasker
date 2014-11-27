@@ -85,8 +85,14 @@ class TaskHandler(ObjectHandler):
             values = values + (params['DROPOFF_LAT'], params['DROPOFF_LONG'])
         else:
             sql += ",DROPOFF_LOC=NULL"
+            
+        if ("WORKER_LOC_LAT" in params and "WORKER_LOC_LONG" in params):
+            sql += ",WORKER_LOC=SDO_GEOMETRY(2001,8307, SDO_POINT_TYPE(:14, :15, NULL),NULL,NULL)"
+            values = values + (params['WORKER_LOC_LAT'], params['WORKER_LOC_LONG'])
+        else:
+            sql += ",DROPOFF_LOC=NULL"
         
-        sql += " WHERE ID = :14"
+        sql += " WHERE ID = :16"
         values = values + (params["ID"],)
             
         conn = self.conn_provider.get_db_connection()
@@ -103,7 +109,8 @@ class TaskHandler(ObjectHandler):
         "TO_CHAR(t.DEADLINE,'YYYY-MM-DD HH24:MI') AS DEADLINE, t.PAYMENT, "\
         "t.PICKUP_LOC.SDO_POINT.X AS PICKUP_LAT, t.PICKUP_LOC.SDO_POINT.Y AS PICKUP_LONG, " \
         "t.DROPOFF_LOC.SDO_POINT.X AS DROPOFF_LAT, t.DROPOFF_LOC.SDO_POINT.Y AS DROPOFF_LONG, " \
-        "t.PICKUP_ADDR, t.DROPOFF_ADDR, t.STATUS FROM TASKS t"
+        "t.WORKER_LOC.SDO_POINT.X AS WORKER_LOC_LAT, t.WORKER_LOC.SDO_POINT.Y AS WORKER_LOC_LONG, " \
+        "t.PICKUP_ADDR, t.DROPOFF_ADDR, t.STATUS FROM TASKS t "
         
         values = ()
         if(params is not None and len(params) > 0):
