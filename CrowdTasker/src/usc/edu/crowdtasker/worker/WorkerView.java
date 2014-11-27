@@ -266,7 +266,6 @@ public class WorkerView extends Fragment implements LocationListener,
 	private void showTaskDetailsPanel(Task task) {
 		this.currentTask = task;
 		final LinearLayout taskPanel = (LinearLayout) rootView.findViewById(R.id.task_details_panel);
-		String directions;
 		taskPanel.setVisibility(View.VISIBLE);
 		
 		TextView taskName = (TextView) mapWrapper.findViewById(R.id.taskName);

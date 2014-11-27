@@ -22,6 +22,22 @@
         <item name="android:background">#3f51b5</item>
     </style>
      -->
+     
+    <style name="CTButton">
+        <item name="android:layout_width">72sp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:typeface">monospace</item>
+        <item name="android:capitalize">characters</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="AcceptButton" parent="@style/CTButton">
+        <item name="android:background">@drawable/rounded_corner_green</item>
+        <item name="android:text">ACCEPT</item>
+    </style>
+    
     <style name="StatusFont">
         <item name="android:layout_width">72dp</item>
         <item name="android:layout_height">wrap_content</item>

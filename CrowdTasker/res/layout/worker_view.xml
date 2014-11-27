@@ -132,16 +132,21 @@
 
                 <Button
                     android:id="@+id/accpetTaskBtn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="150sp"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/button1"
-                    android:text="Accept" />
+                    android:layout_gravity="right"
+                    android:background="@drawable/green_button"
+                    android:textColor="@android:color/white"
+                    android:text="ACCEPT" />
 
                 <Button
                     android:id="@+id/declineTaskBtn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="150sp"
                     android:layout_height="wrap_content"
-                    android:text="Decline" />
+                    android:layout_gravity="right"
+                    android:background="@drawable/red_button"
+                    android:textColor="@android:color/white"
+                    android:text="ABORT" />
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>

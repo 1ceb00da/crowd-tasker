@@ -2,103 +2,140 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp" 
-    android:paddingTop="5dp">
-    
-	<TextView android:id="@+id/task_name"
-	        android:text="@string/task" 
-	        android:layout_width="wrap_content" android:layout_height="wrap_content" 
-	        android:layout_marginBottom="5dp"
-	        android:textAppearance="?android:attr/textAppearanceLarge"
-	        android:textStyle="bold"
-	        android:layout_alignParentTop="true"/> 
-	  
-    <TextView android:id="@+id/description"
-        	android:text="@string/description"
-       	    android:layout_below="@+id/task_name"
-	        android:layout_width="fill_parent" android:layout_height="wrap_content" 
-	        android:layout_marginBottom="3dp" />
-	
-      <LinearLayout android:id="@+id/deadline_wrapper"
-                android:layout_width="wrap_content"
-  				android:layout_height="wrap_content"
-  				android:layout_below="@+id/description"
-  				android:orientation="horizontal"
-  				android:layout_alignParentLeft="true"
-  				android:layout_marginBottom="3dp">
-  				
-        <TextView android:text="@string/deadline"
-      		android:layout_width="wrap_content" android:layout_height="wrap_content" 
-        	android:layout_marginRight="3dp"
-        	android:textStyle="bold" />
-        <TextView android:id="@+id/deadline"
-      		android:layout_width="wrap_content" android:layout_height="wrap_content" />
-     </LinearLayout>
-    
-    <LinearLayout android:id="@+id/payment_wrapper"
-        		android:layout_width="wrap_content"
-  				android:layout_height="wrap_content"
-  				android:layout_below="@+id/deadline_wrapper"
-  				android:orientation="horizontal"
-  				android:layout_alignParentLeft="true"
-  				android:layout_marginBottom="3dp">
-  				
-        <TextView android:text="@string/payment"
-      		android:layout_width="wrap_content" android:layout_height="wrap_content" 
-        	android:layout_marginRight="3dp" android:textStyle="bold"/>
-        <TextView android:id="@+id/payment"
-      		android:layout_width="wrap_content" android:layout_height="wrap_content" />
-     </LinearLayout>
-     
-    <LinearLayout android:id="@+id/worker_wrapper"
-        		android:layout_width="wrap_content"
-  				android:layout_height="wrap_content"
-  				android:layout_below="@+id/payment_wrapper"
-  				android:orientation="horizontal"
-  				android:layout_alignParentLeft="true"
-  				android:layout_marginBottom="3dp">
-  				
-        <TextView android:text="@string/worker_semicolon"
-      		android:layout_width="wrap_content" android:layout_height="wrap_content" 
-        	android:layout_marginRight="3dp" android:textStyle="bold"/>
-        <TextView android:id="@+id/worker"
-      		android:layout_width="wrap_content" android:layout_height="wrap_content" />
-     </LinearLayout>
-     
-    
-    <FrameLayout
-        android:layout_alignParentRight="true" 
-        android:layout_marginRight="7dp"
-        android:layout_centerVertical="true"
+    android:padding="10dp"
+    android:paddingTop="5dp" >
+
+    <TextView
+        android:id="@+id/task_name"
         android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_below="@+id/description">
-        
-    	<TextView android:id="@+id/status_created" style="@style/StatusCreated" android:visibility="gone"
-    	    android:clickable="false"
-			android:focusable="false"
-			android:focusableInTouchMode="false"/>
-    	<TextView android:id="@+id/status_accepted" style="@style/StatusAccepted" android:visibility="gone"
-    	    android:clickable="false"
-			android:focusable="false"
-			android:focusableInTouchMode="false"/>
-       	<TextView android:id="@+id/status_completed" style="@style/StatusCompleted" android:visibility="gone"
-       	    android:clickable="false"
-			android:focusable="false"
-			android:focusableInTouchMode="false"/>
-    	<TextView android:id="@+id/status_canceled" style="@style/StatusCanceled" android:visibility="gone"
-    	    android:clickable="false"
-			android:focusable="false"
-			android:focusableInTouchMode="false"/>
-    			
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="5dp"
+        android:text="@string/task"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/task_name"
+        android:layout_marginBottom="3dp"
+        android:text="@string/description" />
+
+    <LinearLayout
+        android:id="@+id/deadline_wrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/description"
+        android:layout_marginBottom="3dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:text="@string/deadline"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/deadline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/payment_wrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/deadline_wrapper"
+        android:layout_marginBottom="3dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:text="@string/payment"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/payment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/worker_wrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/payment_wrapper"
+        android:layout_marginBottom="3dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:text="@string/worker_semicolon"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/worker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/description"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="7dp" >
+
+        <TextView
+            android:id="@+id/status_created"
+            style="@style/StatusCreated"
+            android:clickable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/status_accepted"
+            style="@style/StatusAccepted"
+            android:clickable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/status_completed"
+            style="@style/StatusCompleted"
+            android:clickable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/status_canceled"
+            style="@style/StatusCanceled"
+            android:clickable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:visibility="gone" />
     </FrameLayout>
-    
-     <fragment 
-	 		android:id="@+id/map"
-	  		android:layout_width="match_parent"
-	  		android:layout_height="match_parent"
-	  		android:layout_below="@+id/worker_wrapper"
-	  		android:layout_marginTop="3dp"
-	  		class="com.google.android.gms.maps.MapFragment"/>
-   
+
+    <fragment
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/worker_wrapper"
+        android:layout_marginTop="3dp"
+        class="com.google.android.gms.maps.MapFragment" />
+
 </RelativeLayout>
