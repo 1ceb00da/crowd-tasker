@@ -68,6 +68,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 					    		}
 					    	})
 					    	.setIcon(android.R.drawable.ic_dialog_info)
+					    	.setCancelable(false)
 					    	.show();
 					}
 					oldStatuses.put(newTask.getId(), newTask.getStatus());

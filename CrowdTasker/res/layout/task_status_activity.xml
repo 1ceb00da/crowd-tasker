@@ -87,7 +87,12 @@
             android:id="@+id/worker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+        
     </LinearLayout>
+     <RatingBar android:id="@+id/worker_rating_bar"  
+          android:layout_below="@+id/payment_wrapper"
+		  android:layout_alignParentRight="true"
+          android:layout_width="wrap_content" android:layout_height="wrap_content" />
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -134,7 +139,7 @@
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/worker_wrapper"
+        android:layout_below="@+id/worker_rating_bar"
         android:layout_marginTop="3dp"
         class="com.google.android.gms.maps.MapFragment" />
 

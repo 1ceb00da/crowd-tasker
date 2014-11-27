@@ -29,6 +29,16 @@ public class User extends JSONBase{
 	public static final String PASS_COL = "PASS";
 	private String password;
 	
+	public static final String FIRST_NAME_COL = "FIRST_NAME";
+	private String firstName;
+	
+	public static final String LAST_NAME_COL = "LAST_NAME";
+	private String lastName;
+	
+	public static final String RATING_COL = "RATING";
+	private Float rating;
+	
+	
 	/**
 	 * @return the login
 	 */
@@ -73,6 +83,42 @@ public class User extends JSONBase{
 		this.password = password;
 	}
 	
+	/**
+	 * @return the firstName
+	 */
+	public String getFirstName() {
+		return firstName;
+	}
+	/**
+	 * @param firstName the firstName to set
+	 */
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	/**
+	 * @return the lastName
+	 */
+	public String getLastName() {
+		return lastName;
+	}
+	/**
+	 * @param lastName the lastName to set
+	 */
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	/**
+	 * @return the rating
+	 */
+	public Float getRating() {
+		return rating;
+	}
+	/**
+	 * @param rating the rating to set
+	 */
+	public void setRating(Float rating) {
+		this.rating = rating;
+	}
 	@Override
 	public JSONObject toJSON() {
 		try{
@@ -82,6 +128,8 @@ public class User extends JSONBase{
 			result.put(LOGIN_COL, login);
 			result.put(PASS_COL, password);
 			result.put(EMAIL_COL, email);
+			result.put(FIRST_NAME_COL, firstName);
+			result.put(LAST_NAME_COL, lastName);
 			
 			return result;
 			
@@ -105,6 +153,14 @@ public class User extends JSONBase{
 			if(!jsonObject.isNull(EMAIL_COL))
 				setEmail(jsonObject.getString(EMAIL_COL));
 			
+			if(!jsonObject.isNull(FIRST_NAME_COL))
+				setFirstName(jsonObject.getString(FIRST_NAME_COL));
+			
+			if(!jsonObject.isNull(LAST_NAME_COL))
+				setLastName(jsonObject.getString(LAST_NAME_COL));
+			
+			if(!jsonObject.isNull(RATING_COL))
+				setRating((float)jsonObject.getDouble(RATING_COL));
 		} catch (JSONException e) {
 			Log.e(TAG, "fromJSON JSONException: " + e.getMessage());
 			return false;

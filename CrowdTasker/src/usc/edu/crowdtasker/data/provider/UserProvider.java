@@ -95,6 +95,33 @@ public class UserProvider extends DataProvider {
 		return true;
 	}
 	
+	
+	public static boolean updateUser(User user){
+		try {
+			JSONObject params = user.toJSON();
+			if(params == null)
+				return false;
+			
+			JSONArray usersJson = performRequest(User.ENTITY_NAME, UPDATE, params);
+			if(usersJson == null)
+				return false;
+			
+			for(int i = 0; i < usersJson.length(); i++){
+				JSONObject resultJson = usersJson.getJSONObject(i);
+				String result = resultJson.getString(RESULT);
+				if(!result.equals(RESULT_OK))
+					return false;
+			}
+		} catch (JSONException e) {
+			Log.e(TAG, "JSONException: " + e.getMessage());
+			return false;
+		} 
+		
+		return true;
+	}
+	
+	
+	
 	public static User getUserById(Long id){
 		if(id == null)
 			return null;

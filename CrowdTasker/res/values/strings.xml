@@ -108,4 +108,12 @@
 	<string name="task_cancel_success">Task successfully canceled</string>
 	<string name="task_cancel_error">Task could not be canceled</string>
 	
+	<string name="profile">Profile</string>
+	<string name="first_name_hint">First Name&#8230;</string>
+	<string name="last_name_hint">Last Name&#8230;</string>
+	
+	<string name="profile_update_success">Profile successfully updates.</string>
+	<string name="profile_update_error">Error: profile could not be updated.</string>
+	
+	
 </resources>

@@ -13,6 +13,8 @@ class UserHandler(ObjectHandler):
             return self.get_users(jsonParams)
         elif action == 'create':
             return self.create_user(jsonParams)
+        elif action == 'update':
+            return self.create_user(jsonParams)
         else:
             return ""
         
@@ -31,6 +33,22 @@ class UserHandler(ObjectHandler):
         
         values = (params.get('LOGIN',None), params.get("PASS",None), \
                   params.get("EMAIL",None), params.get("IMEI",None))
+        
+        conn = self.conn_provider.get_db_connection()
+        cursor = conn.cursor()
+        r = cursor.execute(sql, values)
+        conn.commit()
+        cursor.close()
+        conn.close()
+                
+        return ObjectHandler.OK_JSON
+    
+    def update_user(self,params): 
+        sql = "UPDATE USERS SET PASS=:2, EMAIL=:2, FIRST_NAME=:3, LAST_NAME=:4, IMEI=:5"
+        
+        values = (params.get("PASS",None), params.get("EMAIL",None), \
+                  params.get("FIRST_NAME",None), params.get("LAST_NAME",None), \
+                  params.get("IMEI",None))
         
         conn = self.conn_provider.get_db_connection()
         cursor = conn.cursor()

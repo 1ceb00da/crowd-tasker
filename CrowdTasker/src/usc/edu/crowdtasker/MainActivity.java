@@ -120,6 +120,8 @@ public class MainActivity extends ActionBarActivity implements
     	
     	switch(position){
 	    	case NavigationDrawerFragment.NAV_PROFILE:
+	    		Intent profileIntent = new Intent(getApplicationContext(), ProfileActivity.class);
+	    		startActivity(profileIntent);
 	    		break;
 	    	case NavigationDrawerFragment.NAV_SETTINGS:
 	    		Intent settingsIntent = new Intent(getApplicationContext(), SettingsActivity.class);

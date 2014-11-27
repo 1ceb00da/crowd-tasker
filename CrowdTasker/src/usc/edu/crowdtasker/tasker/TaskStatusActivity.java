@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,13 +49,13 @@ public class TaskStatusActivity extends FragmentActivity{
     private GoogleMap mMap;
     private Polyline currentRoutePoly;
     private TextView workerView;
+    private RatingBar workerRatingBar;
     
     private TextView createdView;
     private TextView acceptedView;
     private TextView completedView;
     private TextView canceledView;
 	
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -67,6 +68,7 @@ public class TaskStatusActivity extends FragmentActivity{
 		payment = (TextView)findViewById(R.id.payment);
 		deadline = (TextView)findViewById(R.id.deadline);
 		workerView = (TextView)findViewById(R.id.worker);
+		workerRatingBar = (RatingBar)findViewById(R.id.worker_rating_bar);
 		
 		createdView = (TextView)findViewById(R.id.status_created);
 		acceptedView = (TextView)findViewById(R.id.status_accepted);
@@ -148,8 +150,18 @@ public class TaskStatusActivity extends FragmentActivity{
 					
 					@Override
 					protected void onPostExecute(User result) {
-						if(result != null)
+						if(result != null){
+							String name = 
+									result.getFirstName() == null ? "":result.getFirstName()
+								  + result.getLastName() == null ? "": " " + result.getLastName();
+							name = name.trim();
+							if(name.isEmpty())
+								name = result.getLogin();
+							else name += " (" + result.getLogin() + ")";
 							workerView.setText(result.getLogin());
+							if(result.getRating() != null)
+								workerRatingBar.setRating(result.getRating());
+						}
 						else workerView.setText(R.string.not_assigned);
 					}
 		    		
@@ -266,9 +278,10 @@ public class TaskStatusActivity extends FragmentActivity{
 	 private void deleteTask(){
 		 if(currentTask == null)
 			 return;
-		 if(currentTask.getStatus().equals(TaskStatus.CREATED)
+		 if(currentTask.getStatus() != null 
+		    && (currentTask.getStatus().equals(TaskStatus.CREATED)
 			|| currentTask.getStatus().equals(TaskStatus.CANCELED)
-			|| currentTask.getStatus().equals(TaskStatus.COMPLETED)){
+			|| currentTask.getStatus().equals(TaskStatus.COMPLETED))){
 			 new AlertDialog.Builder(this)
 		    	.setTitle(R.string.delete_task_dialog_title)
 		    	.setMessage(R.string.delete_task_dialog_msg)

@@ -61,6 +61,9 @@
          <activity
    			android:name="usc.edu.crowdtasker.tasker.TaskStatusActivity"
     		android:label="@string/app_name" />
+        <activity
+   			android:name="usc.edu.crowdtasker.ProfileActivity"
+    		android:label="@string/app_name" />
         
         
     </application>
