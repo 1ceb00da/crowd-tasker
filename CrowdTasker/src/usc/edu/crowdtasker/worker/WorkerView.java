@@ -512,4 +512,10 @@ public class WorkerView extends Fragment implements LocationListener,
 		currentUser = UserProvider.getCurrentUser(getActivity());
 		showTasksOnMap(currentLocation);
 	}
+
+	@Override
+	public void stopUpdate() {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -3,6 +3,8 @@ package usc.edu.crowdtasker.tasker;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import usc.edu.crowdtasker.R;
 import usc.edu.crowdtasker.data.model.Task;
@@ -33,12 +35,15 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 public class TaskStatusActivity extends FragmentActivity{
 	
+    public static final long UPDATE_INTERVAL = 10000;
+
 	private Task currentTask;
 	private TextView taskName;
 	private TextView description;
@@ -55,6 +60,10 @@ public class TaskStatusActivity extends FragmentActivity{
     private TextView acceptedView;
     private TextView completedView;
     private TextView canceledView;
+    
+    private Timer updateTimer;
+    
+    private Marker currentWorkerMarker;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -83,41 +92,112 @@ public class TaskStatusActivity extends FragmentActivity{
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Bundle extras = getIntent().getExtras();
-	    currentTask = new Task();
+		final Bundle extras = getIntent().getExtras();
 	    if(extras != null && extras.containsKey(Task.ID_COL)){
-	    	
-	    	   new AsyncTask<Long, Void, Task>(){
-	    		   
-				@Override
-				protected Task doInBackground(Long... params) {
-			    	  return TaskProvider.getTaskById(params[0]);
-				}
+			updateTimer = new Timer();
+	    	updateTimer.scheduleAtFixedRate(new TimerTask() {
 				
-				@Override
-				protected void onPostExecute(Task task) {
-					if(task != null){
-						currentTask = task;
-						setFieldsFromTask();
-					}
-				}  
-	    	   }.execute(extras.getLong(Task.ID_COL));
+	    		@Override
+				public void run() {
+	    			new AsyncTask<Long, Void, Task>(){
+	    		   
+						@Override
+						protected Task doInBackground(Long... params) {
+							return TaskProvider.getTaskById(params[0]);
+						}
+				
+						@Override
+						protected void onPostExecute(Task task) {
+							if(task == null)
+								return;
+							if(currentTask == null){
+								currentTask = task;
+								setFieldsFromTask();
+							}else{
+								currentTask = task;
+								updateTaskStatus();
+							}
+						}  
+	    			}.execute(extras.getLong(Task.ID_COL));
+				}
+			}, 0, UPDATE_INTERVAL);
 	     }
 	}
 	
-	 private void setFieldsFromTask(){
-	    	if(currentTask.getName() != null)
-	    		taskName.setText(currentTask.getName());
-	    	
-	    	if(currentTask.getDescription() != null)
-	    		description.setText(currentTask.getDescription());
-	    	
-	    	if(currentTask.getDeadline() != null)
-	    		deadline.setText(dateFormat.format(currentTask.getDeadline()));
-	    	
-	    	if(currentTask.getPayment() != null)
-	    		payment.setText(moneyFormat.format(currentTask.getPayment()));
-	    	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if(updateTimer != null){
+			updateTimer.cancel();
+			updateTimer.purge();
+		}
+	}
+	private void setFieldsFromTask(){
+    	if(currentTask.getName() != null)
+    		taskName.setText(currentTask.getName());
+    	
+    	if(currentTask.getDescription() != null)
+    		description.setText(currentTask.getDescription());
+    	
+    	if(currentTask.getDeadline() != null)
+    		deadline.setText(dateFormat.format(currentTask.getDeadline()));
+    	
+    	if(currentTask.getPayment() != null)
+    		payment.setText(moneyFormat.format(currentTask.getPayment()));
+    	
+		mMap.clear();
+		
+		LatLng pickupLoc = null;
+		LatLng dropoffLoc = null;
+		
+		if(currentTask.getPickupLocation() != null){
+			MarkerOptions opt = new MarkerOptions();
+			pickupLoc = new LatLng(currentTask.getPickupLocation()[0], 
+					currentTask.getPickupLocation()[1]);
+			opt.position(pickupLoc);
+			opt.icon(BitmapDescriptorFactory
+					.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+			mMap.addMarker(opt);
+		}
+		
+		if(currentTask.getDropoffLocation() != null){
+			MarkerOptions opt = new MarkerOptions();
+			dropoffLoc = new LatLng(currentTask.getDropoffLocation()[0], 
+					currentTask.getDropoffLocation()[1]);
+			opt.position(dropoffLoc);
+			opt.icon(BitmapDescriptorFactory
+					.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+			mMap.addMarker(opt);	
+		}
+		
+		if(pickupLoc != null && dropoffLoc != null){
+			LatLngBounds.Builder boundsBuilder = LatLngBounds.builder();
+			boundsBuilder.include(pickupLoc);
+			boundsBuilder.include(dropoffLoc);
+			LatLngBounds bounds = boundsBuilder.build();
+			CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 150);
+			mMap.animateCamera(cameraUpdate);
+		}
+		
+		if(currentTask.getPickupAddress() != null && currentTask.getDropoffAddress() != null){
+						new AsyncTask<String, Void, List<LatLng>>(){
+				@Override
+				protected  List<LatLng> doInBackground(String... params) {
+					return RouteProvider.getRoute(params[0], params[1]); 
+				}
+				@Override
+				protected void onPostExecute(List<LatLng> result) {
+					showRoute(result);
+				}
+			}.execute(currentTask.getPickupAddress(), currentTask.getDropoffAddress());
+		}
+		
+		updateTaskStatus();
+			
+	 }
+	 
+	 private void updateTaskStatus(){
+
 	    	if(currentTask.getStatus() != null){
 		    	createdView.setVisibility(View.GONE);
 				acceptedView.setVisibility(View.GONE);
@@ -168,55 +248,18 @@ public class TaskStatusActivity extends FragmentActivity{
 		    	}.execute(currentTask.getWorkerId());
 	    	}else workerView.setText(R.string.not_assigned);
 	    	
-			mMap.clear();
-			
-			LatLng pickupLoc = null;
-			LatLng dropoffLoc = null;
-			
-			if(currentTask.getPickupLocation() != null){
-				MarkerOptions opt = new MarkerOptions();
-				pickupLoc = new LatLng(currentTask.getPickupLocation()[0], 
-						currentTask.getPickupLocation()[1]);
-				opt.position(pickupLoc);
-				opt.icon(BitmapDescriptorFactory
-						.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-				mMap.addMarker(opt);
-			}
-			
-			if(currentTask.getDropoffLocation() != null){
-				MarkerOptions opt = new MarkerOptions();
-				dropoffLoc = new LatLng(currentTask.getDropoffLocation()[0], 
-						currentTask.getDropoffLocation()[1]);
-				opt.position(dropoffLoc);
-				opt.icon(BitmapDescriptorFactory
-						.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+	    	if(currentWorkerMarker != null)
+	    		currentWorkerMarker.remove();
+	    	
+	    	if(currentTask.getWorkerLocation() != null){
+	    		MarkerOptions opt = new MarkerOptions();
+				LatLng workerLatLng = new LatLng(currentTask.getWorkerLocation()[0], 
+						currentTask.getWorkerLocation()[1]);
+				opt.position(workerLatLng);
+				opt.icon(BitmapDescriptorFactory.fromResource(R.drawable.ironman_64));
 				mMap.addMarker(opt);	
-			}
-			
-			if(pickupLoc != null && dropoffLoc != null){
-				LatLngBounds.Builder boundsBuilder = LatLngBounds.builder();
-				boundsBuilder.include(pickupLoc);
-				boundsBuilder.include(dropoffLoc);
-				LatLngBounds bounds = boundsBuilder.build();
-				CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 150);
-				mMap.animateCamera(cameraUpdate);
-			}
-			
-			if(currentTask.getPickupAddress() != null && currentTask.getDropoffAddress() != null){
-							new AsyncTask<String, Void, List<LatLng>>(){
-					@Override
-					protected  List<LatLng> doInBackground(String... params) {
-						return RouteProvider.getRoute(params[0], params[1]); 
-					}
-					@Override
-					protected void onPostExecute(List<LatLng> result) {
-						showRoute(result);
-					}
-				}.execute(currentTask.getPickupAddress(), currentTask.getDropoffAddress());
-			}
-			
-			
-
+	    	}
+	    	
 	 }
 	 
 	 private void showRoute( List<LatLng> routePoints) {

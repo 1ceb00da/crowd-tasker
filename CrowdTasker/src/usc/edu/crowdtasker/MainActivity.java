@@ -114,6 +114,11 @@ public class MainActivity extends ActionBarActivity implements
     	super.onResume();
     }
 
+    @Override
+    protected void onPause() {
+    	super.onPause();
+    	mSectionsPagerAdapter.stopUpdateFragments();
+    }
     
     @Override
     public void onNavigationDrawerItemSelected(int position) {
@@ -223,10 +228,24 @@ public class MainActivity extends ActionBarActivity implements
     		updateCurrentFragment();
         }
         
+        public void stopUpdateFragments(){
+        	if(fragments != null){
+	        	for(int i = 0; i < fragments.length; i++){
+	    			((UpdatableFragment)fragments[i]).stopUpdate();
+	    		}
+        	}
+        }
+        
         public void updateCurrentFragment(){
         	if(currentPosition >= 0 && currentPosition < fragments.length
         			&& fragments[currentPosition] != null){
-        		((UpdatableFragment)fragments[currentPosition]).update();
+        		for(int i = 0; i < fragments.length; i++){
+        			if(i == currentPosition){
+                		((UpdatableFragment)fragments[i]).update();
+        			}else{
+                		((UpdatableFragment)fragments[i]).stopUpdate();
+        			}
+        		}
         	}
         }
 

@@ -79,7 +79,7 @@ public class TaskerView extends Fragment implements UpdatableFragment{
 			}
 		});
         
-        update();
+       // update();
 	  
       
         newTaskBtn = (Button)(rootView.findViewById(R.id.new_task_btn));
@@ -123,4 +123,14 @@ public class TaskerView extends Fragment implements UpdatableFragment{
 	    0, // Set how long before to start calling the TimerTask (in milliseconds)
 	    UPDATE_INTERVAL); // Set the amount of time between each execution (in milliseconds)		
 	}
+
+	@Override
+	public void stopUpdate() {
+		if(updateTimer != null){
+        	updateTimer.cancel();
+        	updateTimer.purge();
+        }		
+	}
+	
+	
 }
