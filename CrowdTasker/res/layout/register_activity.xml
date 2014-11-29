@@ -23,14 +23,15 @@
     <EditText android:hint="@string/password_hint" android:id="@+id/password"
 			  android:layout_width="match_parent" android:layout_height="wrap_content" 
 	          android:layout_marginBottom="3dp" 
-    	      android:layout_centerInParent="true"
     	      android:inputType="textPassword"
-    	      android:singleLine="true"/>
+    	      android:singleLine="true"
+    	      android:layout_above="@+id/password_repeat"
+    	      />
     <EditText android:hint="@string/password_repeat_hint" android:id="@+id/password_repeat"
 			  android:layout_width="match_parent" android:layout_height="wrap_content" 
 	          android:layout_marginBottom="3dp" 
-	          android:layout_below="@+id/password" 
-    	      android:inputType="textPassword"
+	          android:layout_centerInParent="true"
+	          android:inputType="textPassword"
     	      android:singleLine="true"/>
      <EditText android:hint="@string/email_hint" android:id="@+id/email"
 			  android:layout_width="match_parent" android:layout_height="wrap_content" 

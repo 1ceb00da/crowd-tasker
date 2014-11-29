@@ -3,6 +3,7 @@ package usc.edu.crowdtasker;
 import usc.edu.crowdtasker.data.model.User;
 import usc.edu.crowdtasker.data.provider.UserProvider;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -25,6 +26,8 @@ public class LoginActivity extends Activity {
 	
 	private SharedPreferences prefs;
 	
+	private ProgressDialog progressDialog;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,6 +40,10 @@ public class LoginActivity extends Activity {
         
         username = (EditText)findViewById(R.id.username);
         password = (EditText)findViewById(R.id.password);
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.login)+"...");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setCancelable(false);
         
         loginBtn.setOnClickListener(new OnClickListener() {
 			@Override
@@ -57,6 +64,7 @@ public class LoginActivity extends Activity {
 	}
 	
 	private void login(){
+		progressDialog.show();
 		new AsyncTask<String, Void, User>() {
 			
 			@Override
@@ -68,6 +76,7 @@ public class LoginActivity extends Activity {
 			
 			@Override
 			protected void onPostExecute(User result) {
+				progressDialog.dismiss();
 				if(result != null){					
 					Editor editor = prefs.edit();
 					editor.putString(getString(R.string.pref_username), result.getLogin());

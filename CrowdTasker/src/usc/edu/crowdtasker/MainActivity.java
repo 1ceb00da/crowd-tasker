@@ -231,7 +231,9 @@ public class MainActivity extends ActionBarActivity implements
         public void stopUpdateFragments(){
         	if(fragments != null){
 	        	for(int i = 0; i < fragments.length; i++){
-	    			((UpdatableFragment)fragments[i]).stopUpdate();
+	        		if(fragments[i] != null){
+	        			((UpdatableFragment)fragments[i]).stopUpdate();
+	        		}
 	    		}
         	}
         }

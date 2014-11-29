@@ -73,6 +73,8 @@ public class Task extends JSONBase{
 	public static final String WORKER_LOC_LONG_COL = "WORKER_LOC_LONG";
 	private double[] workerLocation;
 
+	public static final String RATING_COL = "RATING";
+	private Double rating;
 
 
 	/**
@@ -232,6 +234,18 @@ public class Task extends JSONBase{
 		this.status = status;
 	}
 	
+	/**
+	 * @return the rating
+	 */
+	public Double getRating() {
+		return rating;
+	}
+	/**
+	 * @param rating the rating to set
+	 */
+	public void setRating(Double rating) {
+		this.rating = rating;
+	}
 	@Override
 	public JSONObject toJSON() {
 		try{
@@ -270,6 +284,9 @@ public class Task extends JSONBase{
 			
 			if(status != null)
 				result.put(STATUS_COL, status.name());
+			
+			if(rating != null)
+				result.put(RATING_COL, rating);
 			return result;
 			
 		} catch (JSONException e) {
@@ -323,6 +340,9 @@ public class Task extends JSONBase{
 			
 			if(!jsonObject.isNull(STATUS_COL))
 				setStatus(TaskStatus.valueOf(jsonObject.getString(STATUS_COL)));
+			
+			if(!jsonObject.isNull(RATING_COL))
+				setRating(jsonObject.getDouble(RATING_COL));
 			
 		} catch (JSONException e) {
 			Log.e(TAG, "fromJSON JSONException: " + e.getMessage());

@@ -15,15 +15,18 @@
     
     <RatingBar android:id="@+id/rating_bar"  
           android:layout_width="wrap_content" android:layout_height="wrap_content" 
-          android:layout_below="@+id/username" />
+          android:layout_alignParentRight="true"
+          android:layout_alignParentTop="true" 
+          style = "?android:attr/ratingBarStyleSmall"/>
 			    
     <EditText android:hint="@string/first_name_hint" android:id="@+id/first_name"
 			  android:layout_width="match_parent" android:layout_height="wrap_content" 
-	          android:layout_marginBottom="3dp"	          
-	          android:layout_below="@+id/rating_bar" 
+	          android:layout_marginBottom="3dp"	 
+	          android:layout_marginTop="10dp"         
+	          android:layout_below="@+id/username" 
     	      android:singleLine="true"/>
     
-      <EditText android:hint="@string/last_name_hint" android:id="@+id/last_name"
+     <EditText android:hint="@string/last_name_hint" android:id="@+id/last_name"
 			  android:layout_width="match_parent" android:layout_height="wrap_content" 
 	          android:layout_marginBottom="3dp" 
 	          android:layout_below="@+id/first_name" 

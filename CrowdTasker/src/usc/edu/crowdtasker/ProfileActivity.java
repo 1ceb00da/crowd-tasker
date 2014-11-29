@@ -3,6 +3,7 @@ package usc.edu.crowdtasker;
 import usc.edu.crowdtasker.data.model.User;
 import usc.edu.crowdtasker.data.provider.UserProvider;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -24,6 +25,8 @@ public class ProfileActivity extends Activity {
 	private RatingBar ratingBar;
 	private Button saveBtn;
 	
+	private ProgressDialog progressDialog;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -38,6 +41,11 @@ public class ProfileActivity extends Activity {
 		ratingBar = (RatingBar)findViewById(R.id.rating_bar);
 		ratingBar.setActivated(false);
 		
+		progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.saving_profile));
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setCancelable(false);
+        
 		if(currentUser != null){
 			username.setText(currentUser.getLogin());
 			new AsyncTask<Long, Void, User>() {
@@ -57,15 +65,20 @@ public class ProfileActivity extends Activity {
 					if(result.getLastName() != null)
 						lastName.setText(result.getLastName());
 					if(result.getRating() != null)
-						ratingBar.setRating(result.getRating());
+						ratingBar.setRating(result.getRating().floatValue());
 				}
 			}.execute(currentUser.getId());
 			
 			saveBtn.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
+					currentUser.setFirstName(firstName.getText().toString());
+					currentUser.setLastName(lastName.getText().toString());
+					currentUser.setEmail(email.getText().toString());
 					new AsyncTask<User, Void, Boolean>(){
-
+						protected void onPreExecute() {
+							progressDialog.show();
+						}
 						@Override
 						protected Boolean doInBackground(User... params) {
 							return UserProvider.updateUser(params[0]);
@@ -77,6 +90,7 @@ public class ProfileActivity extends Activity {
 										R.string.profile_update_success, Toast.LENGTH_LONG).show();
 							else Toast.makeText(getApplicationContext(),
 										R.string.profile_update_error, Toast.LENGTH_LONG).show();
+							progressDialog.dismiss();
 						}
 						
 					}.execute(currentUser);

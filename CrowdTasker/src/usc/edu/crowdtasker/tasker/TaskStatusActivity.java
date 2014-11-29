@@ -7,13 +7,16 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import usc.edu.crowdtasker.R;
+import usc.edu.crowdtasker.data.model.Rating;
 import usc.edu.crowdtasker.data.model.Task;
 import usc.edu.crowdtasker.data.model.Task.TaskStatus;
 import usc.edu.crowdtasker.data.model.User;
+import usc.edu.crowdtasker.data.provider.RatingProvider;
 import usc.edu.crowdtasker.data.provider.RouteProvider;
 import usc.edu.crowdtasker.data.provider.TaskProvider;
 import usc.edu.crowdtasker.data.provider.UserProvider;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -24,7 +27,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.RatingBar.OnRatingBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +50,9 @@ public class TaskStatusActivity extends FragmentActivity{
     public static final long UPDATE_INTERVAL = 10000;
 
 	private Task currentTask;
+	private User currentWorker;
+	private User currentUser;
+	
 	private TextView taskName;
 	private TextView description;
 	private TextView payment;
@@ -55,20 +63,24 @@ public class TaskStatusActivity extends FragmentActivity{
     private Polyline currentRoutePoly;
     private TextView workerView;
     private RatingBar workerRatingBar;
+    private RatingBar rateTaskRatingBar;
     
     private TextView createdView;
     private TextView acceptedView;
     private TextView completedView;
     private TextView canceledView;
-    
+    private LinearLayout rateTaskView;
     private Timer updateTimer;
     
     private Marker currentWorkerMarker;
-	
+    private ProgressDialog progressDialog;
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.task_status_activity);
+		
+		currentUser = UserProvider.getCurrentUser(this);
 	    dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,DateFormat.SHORT);
 		moneyFormat = NumberFormat.getCurrencyInstance();
 		
@@ -83,10 +95,42 @@ public class TaskStatusActivity extends FragmentActivity{
 		acceptedView = (TextView)findViewById(R.id.status_accepted);
 		completedView = (TextView)findViewById(R.id.status_completed);
 		canceledView = (TextView)findViewById(R.id.status_canceled);
-		
+		rateTaskView = (LinearLayout)findViewById(R.id.rate_task_wrapper);
+		rateTaskRatingBar = (RatingBar)findViewById(R.id.rate_task);
+		rateTaskRatingBar.setOnRatingBarChangeListener(new OnRatingBarChangeListener() {
+			
+			@Override
+			public void onRatingChanged(RatingBar ratingBar, final float rating, boolean fromUser) {
+				if(fromUser && currentTask != null && currentUser != null){
+					Rating newRating = new Rating();
+					newRating.setFromId(currentUser.getId());
+					newRating.setToId(currentWorker.getId());
+					newRating.setTaskId(currentTask.getId());
+					newRating.setRating(rating);
+					System.err.println("RTCH "+currentTask.getRating() + " "+rating);
+					new AsyncTask<Rating, Void, Boolean>(){
+						@Override
+						protected Boolean doInBackground(Rating... params) {
+							if(currentTask.getRating() == null)
+								return RatingProvider.createRating(params[0]);
+							else return RatingProvider.updateRating(params[0]);
+						}
+						
+						protected void onPostExecute(Boolean result) {
+							if(result){
+								currentTask.setRating((double)rating);
+								updateTaskStatus();
+							}else Toast.makeText(getApplicationContext(), 
+								R.string.task_rate_error, Toast.LENGTH_LONG).show();
+						}
+						
+					}.execute(newRating);
+					
+				}
+			}
+		});
+
 		setUpMapIfNeeded();
-		
-		
 	}
 	
 	@Override
@@ -95,6 +139,14 @@ public class TaskStatusActivity extends FragmentActivity{
 		final Bundle extras = getIntent().getExtras();
 	    if(extras != null && extras.containsKey(Task.ID_COL)){
 			updateTimer = new Timer();
+			if(progressDialog == null){
+				progressDialog = new ProgressDialog(this);
+		        progressDialog.setMessage(getString(R.string.loading_task_status));
+		        progressDialog.setCanceledOnTouchOutside(false);
+		        progressDialog.setCancelable(false);
+				progressDialog.show();
+			}
+			
 	    	updateTimer.scheduleAtFixedRate(new TimerTask() {
 				
 	    		@Override
@@ -110,6 +162,8 @@ public class TaskStatusActivity extends FragmentActivity{
 						protected void onPostExecute(Task task) {
 							if(task == null)
 								return;
+							
+							System.err.println("TTT "+task.getRating());
 							if(currentTask == null){
 								currentTask = task;
 								setFieldsFromTask();
@@ -203,13 +257,17 @@ public class TaskStatusActivity extends FragmentActivity{
 				acceptedView.setVisibility(View.GONE);
 				completedView.setVisibility(View.GONE);
 				canceledView.setVisibility(View.GONE);
-				
+				rateTaskView.setVisibility(View.GONE);
 				switch(currentTask.getStatus()){
 					case ACCEPTED:
 						acceptedView.setVisibility(View.VISIBLE);
 						break;
 					case COMPLETED:
 						completedView.setVisibility(View.VISIBLE);
+						if(currentTask.getRating() != null)
+							rateTaskRatingBar.setRating(currentTask.getRating().floatValue());
+						
+						rateTaskView.setVisibility(View.VISIBLE);
 						break;
 					case CANCELED:
 						canceledView.setVisibility(View.VISIBLE);
@@ -231,27 +289,40 @@ public class TaskStatusActivity extends FragmentActivity{
 					@Override
 					protected void onPostExecute(User result) {
 						if(result != null){
+							currentWorker = result;
 							String name = 
-									result.getFirstName() == null ? "":result.getFirstName()
-								  + result.getLastName() == null ? "": " " + result.getLastName();
+									(result.getFirstName() == null ? "":result.getFirstName())
+								  + (result.getLastName() == null ? "": " " + result.getLastName());
 							name = name.trim();
+							
 							if(name.isEmpty())
-								name = result.getLogin();
-							else name += " (" + result.getLogin() + ")";
-							workerView.setText(result.getLogin());
+								workerView.setText(result.getLogin());
+							else workerView.setText(name);
+							
 							if(result.getRating() != null)
-								workerRatingBar.setRating(result.getRating());
+								workerRatingBar.setRating(result.getRating().floatValue());
+							workerRatingBar.setVisibility(View.VISIBLE);
 						}
-						else workerView.setText(R.string.not_assigned);
+						else {
+							workerView.setText(R.string.not_assigned);
+							workerRatingBar.setVisibility(View.INVISIBLE);
+						}
+						if(progressDialog.isShowing())
+							progressDialog.dismiss();
 					}
 		    		
 		    	}.execute(currentTask.getWorkerId());
-	    	}else workerView.setText(R.string.not_assigned);
+	    	}else {
+	    		workerView.setText(R.string.not_assigned);
+	    		if(progressDialog.isShowing())
+					progressDialog.dismiss();
+	    	}
 	    	
 	    	if(currentWorkerMarker != null)
 	    		currentWorkerMarker.remove();
 	    	
-	    	if(currentTask.getWorkerLocation() != null){
+	    	if(currentTask.getStatus().equals(TaskStatus.ACCEPTED) 
+	    			&& currentTask.getWorkerLocation() != null){
 	    		MarkerOptions opt = new MarkerOptions();
 				LatLng workerLatLng = new LatLng(currentTask.getWorkerLocation()[0], 
 						currentTask.getWorkerLocation()[1]);
@@ -322,14 +393,13 @@ public class TaskStatusActivity extends FragmentActivity{
 		 if(currentTask == null)
 			 return;
 		 if(currentTask.getStatus() != null 
-		    && (currentTask.getStatus().equals(TaskStatus.CREATED)
-			|| currentTask.getStatus().equals(TaskStatus.CANCELED)
-			|| currentTask.getStatus().equals(TaskStatus.COMPLETED))){
+		    && currentTask.getStatus().equals(TaskStatus.CREATED)){
 			 new AlertDialog.Builder(this)
 		    	.setTitle(R.string.delete_task_dialog_title)
 		    	.setMessage(R.string.delete_task_dialog_msg)
 		    	.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 		    		public void onClick(final DialogInterface dialog, int which) { 
+		    			progressDialog.show();
 		    			new AsyncTask<Long, Void, Boolean>(){
 
 							@Override
@@ -339,6 +409,7 @@ public class TaskStatusActivity extends FragmentActivity{
 							
 							@Override
 							protected void onPostExecute(Boolean result) {
+								progressDialog.dismiss();
 								if(result){
 									Toast.makeText(getApplicationContext(),
 											R.string.task_delete_success, Toast.LENGTH_LONG).show();
@@ -367,6 +438,7 @@ public class TaskStatusActivity extends FragmentActivity{
 		    	.setMessage(R.string.delete_task_dialog_cancel)
 		    	.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 		    		public void onClick(final DialogInterface dialog, int which) { 
+		    			progressDialog.show();
 		    			new AsyncTask<Task, Void, Boolean>(){
 
 							@Override
@@ -383,9 +455,11 @@ public class TaskStatusActivity extends FragmentActivity{
 									dialog.dismiss();
 									setFieldsFromTask();
 								}else{
+					    			progressDialog.dismiss();
 									Toast.makeText(getApplicationContext(),
 											R.string.task_cancel_error, Toast.LENGTH_LONG).show();
 									dialog.dismiss();
+
 								}
 							}
 		    				

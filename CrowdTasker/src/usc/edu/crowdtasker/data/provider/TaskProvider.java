@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import usc.edu.crowdtasker.data.model.Task;
 import usc.edu.crowdtasker.data.model.User;
+import android.media.Rating;
 import android.util.Log;
 
 public class TaskProvider extends DataProvider {
@@ -141,5 +142,4 @@ public class TaskProvider extends DataProvider {
 		} 
 		return true;
 	}
-
 }

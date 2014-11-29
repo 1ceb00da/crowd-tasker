@@ -3,6 +3,7 @@ package usc.edu.crowdtasker;
 import usc.edu.crowdtasker.data.model.User;
 import usc.edu.crowdtasker.data.provider.UserProvider;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ public class RegisterActivity extends Activity {
 	private EditText password;
 	private EditText passwordRepeat;
 	private EditText email;
+	private ProgressDialog progressDialog;
 	
 	private SharedPreferences prefs;
 	@Override
@@ -34,7 +36,11 @@ public class RegisterActivity extends Activity {
 		password = (EditText)findViewById(R.id.password);
 		passwordRepeat = (EditText)findViewById(R.id.password_repeat);
 		email = (EditText)findViewById(R.id.email);
-		
+		progressDialog = new ProgressDialog(this);
+	    progressDialog.setMessage(getString(R.string.register)+"...");
+	    progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setCancelable(false);
+	        
 		registerBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -65,6 +71,7 @@ public class RegisterActivity extends Activity {
 		user.setEmail(emailStr);
 		user.setPassword(passwordStr);
 		
+		progressDialog.show();
 		new AsyncTask<User, Void, Boolean>(){
 
 			@Override
@@ -74,6 +81,7 @@ public class RegisterActivity extends Activity {
 			
 			@Override
 			protected void onPostExecute(Boolean result) {
+				progressDialog.dismiss();
 				if(result){
 					Toast.makeText(getApplicationContext(), R.string.register_success, 
 							Toast.LENGTH_LONG).show();

@@ -36,7 +36,7 @@ public class User extends JSONBase{
 	private String lastName;
 	
 	public static final String RATING_COL = "RATING";
-	private Float rating;
+	private Double rating;
 	
 	
 	/**
@@ -110,13 +110,13 @@ public class User extends JSONBase{
 	/**
 	 * @return the rating
 	 */
-	public Float getRating() {
+	public Double getRating() {
 		return rating;
 	}
 	/**
 	 * @param rating the rating to set
 	 */
-	public void setRating(Float rating) {
+	public void setRating(Double rating) {
 		this.rating = rating;
 	}
 	@Override
@@ -150,6 +150,9 @@ public class User extends JSONBase{
 			if(!jsonObject.isNull(LOGIN_COL))
 				setLogin(jsonObject.getString(LOGIN_COL));
 			
+			if(!jsonObject.isNull(PASS_COL))
+				setPassword(jsonObject.getString(PASS_COL));
+			
 			if(!jsonObject.isNull(EMAIL_COL))
 				setEmail(jsonObject.getString(EMAIL_COL));
 			
@@ -160,7 +163,7 @@ public class User extends JSONBase{
 				setLastName(jsonObject.getString(LAST_NAME_COL));
 			
 			if(!jsonObject.isNull(RATING_COL))
-				setRating((float)jsonObject.getDouble(RATING_COL));
+				setRating(jsonObject.getDouble(RATING_COL));
 		} catch (JSONException e) {
 			Log.e(TAG, "fromJSON JSONException: " + e.getMessage());
 			return false;

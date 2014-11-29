@@ -8,7 +8,9 @@ import usc.edu.crowdtasker.data.model.Task;
 import usc.edu.crowdtasker.data.model.Task.TaskStatus;
 import usc.edu.crowdtasker.data.model.User;
 import usc.edu.crowdtasker.data.provider.TaskProvider;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,15 +27,36 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	private List<Task> tasks;
 	private Context context;
 	private HashMap<Long, TaskStatus> oldStatuses;
+	private ProgressDialog progressDialog;
+
 	
 	public TaskListAdapter(Context context, User user, int resource) {
 		super(context, resource);
 		this.user = user;
 		this.context = context;
+		
 	}
 	
 	public void updateTasks(){
+
 		new AsyncTask<User, Void, List<Task>>() {
+			
+			@Override
+			protected void onPreExecute() {
+				if(progressDialog == null){
+					((Activity)context).runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							progressDialog = new ProgressDialog(context);
+					        progressDialog.setMessage(context.getString(R.string.loading_tasks));
+					        progressDialog.setCanceledOnTouchOutside(false);
+					        progressDialog.setCancelable(false);
+							progressDialog.show();
+						}
+					});
+				}
+			}
+			
 			@Override
 			protected List<Task> doInBackground(User... users) {
 				return TaskProvider.getTasks(users[0]);
@@ -41,6 +64,9 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 			
 			@Override
 			protected void onPostExecute(List<Task> result) {
+				if(progressDialog.isShowing())
+					progressDialog.dismiss();
+
 				if(tasks == null || oldStatuses == null){
 					tasks = result;
 					oldStatuses = new HashMap<Long, TaskStatus>();

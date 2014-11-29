@@ -110,7 +110,8 @@ class TaskHandler(ObjectHandler):
         "t.PICKUP_LOC.SDO_POINT.X AS PICKUP_LAT, t.PICKUP_LOC.SDO_POINT.Y AS PICKUP_LONG, " \
         "t.DROPOFF_LOC.SDO_POINT.X AS DROPOFF_LAT, t.DROPOFF_LOC.SDO_POINT.Y AS DROPOFF_LONG, " \
         "t.WORKER_LOC.SDO_POINT.X AS WORKER_LOC_LAT, t.WORKER_LOC.SDO_POINT.Y AS WORKER_LOC_LONG, " \
-        "t.PICKUP_ADDR, t.DROPOFF_ADDR, t.STATUS FROM TASKS t "
+        "t.PICKUP_ADDR, t.DROPOFF_ADDR, t.STATUS, r.RATING FROM TASKS t LEFT JOIN RATINGS r " \
+        "ON t.id = r.task_id "
         
         values = ()
         if(params is not None and len(params) > 0):
@@ -128,7 +129,7 @@ class TaskHandler(ObjectHandler):
             paramsSql, paramsValues = self.convert_get_tasks_params(params, i)
             sql += paramsSql
             values = values + paramsValues
-    
+        
         conn = self.conn_provider.get_db_connection()
         cursor = conn.cursor()
         cursor.execute(sql, values)
