@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import usc.edu.crowdtasker.R;
 import usc.edu.crowdtasker.UpdatableFragment;
@@ -19,8 +20,10 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,6 +86,10 @@ public class WorkerView extends Fragment implements LocationListener,
 
 	private Button acceptBtn;
 	private Button declineBtn;
+	
+	private TextView timerTextView;
+	private CountDownTimer timer;
+	private Time currentTime;
 
 	/**
 	 * Returns a new instance of this fragment for the given section number.
@@ -114,6 +121,8 @@ public class WorkerView extends Fragment implements LocationListener,
 		dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
 				DateFormat.SHORT);
 		moneyFormat = NumberFormat.getCurrencyInstance();
+		
+		timerTextView = (TextView) rootView.findViewById(R.id.timerTextView);
 
 		return rootView;
 	}
@@ -204,16 +213,6 @@ public class WorkerView extends Fragment implements LocationListener,
 					LatLng pickupLoc = new LatLng(task.getPickupLocation()[0],
 							task.getPickupLocation()[1]);
 					opt.position(pickupLoc);
-					opt.title(task.getName());
-					String snippet = "";
-					if (task.getDescription() != null)
-						snippet += task.getDescription();
-					if (task.getPayment() != null)
-						snippet += ", "
-								+ NumberFormat.getCurrencyInstance().format(
-										task.getPayment());
-
-					opt.snippet(snippet);
 					if (currentUser != null
 							&& task.getOwnerId() == currentUser.getId())
 						opt.icon(BitmapDescriptorFactory
@@ -278,6 +277,9 @@ public class WorkerView extends Fragment implements LocationListener,
 	@Override
 	public boolean onMarkerClick(Marker marker) {
 
+		if (isOnTask) {
+			return true;
+		}
 		if (openDropoffMarker != null) {
 			if (openDropoffMarker.equals(marker)) {
 				if (openPickupMarker != null)
@@ -300,18 +302,39 @@ public class WorkerView extends Fragment implements LocationListener,
 						.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 
 				openDropoffMarker = mMap.addMarker(opt);
+				
+				// Show route
+				if (currentRoutePoly != null) {
+					currentRoutePoly.remove();
+				}
+				String pickUp = task.getPickupAddress();
+				String dropOff = task.getDropoffAddress();
+
+				new AsyncTask<String, Void, List<LatLng>>() {
+					@Override
+					protected List<LatLng> doInBackground(String... params) {
+						return RouteProvider.getRoute(params[0], params[1]);
+					}
+
+					@Override
+					protected void onPostExecute(List<LatLng> result) {
+						showRoute(result);
+					}
+				}.execute(pickUp, dropOff);
 				openDropoffMarker.showInfoWindow();
 				showTaskDetailsPanel(task);
 			}
 			openPickupMarker = marker;
 			openPickupMarker.showInfoWindow();
+			
+
 			fitToOpenMarkers();
 		}
 		return true;
 	}
 
 	private void showTaskDetailsPanel(Task task) {
-		this.currentTask = task;
+		currentTask = task;
 		final LinearLayout taskPanel = (LinearLayout) rootView
 				.findViewById(R.id.task_details_panel);
 		taskPanel.setVisibility(View.VISIBLE);
@@ -405,7 +428,6 @@ public class WorkerView extends Fragment implements LocationListener,
 			//do nothing
 			
 		}
-		
 		else {
 			// hide task details panel
 			mapWrapper.findViewById(R.id.task_details_panel).setVisibility(
@@ -413,7 +435,6 @@ public class WorkerView extends Fragment implements LocationListener,
 			if (currentRoutePoly != null) {
 				currentRoutePoly.remove();
 			}
-
 			if (openDropoffMarker != null) {
 				openDropoffMarker.remove();
 				openDropoffMarker = null;
@@ -432,25 +453,61 @@ public class WorkerView extends Fragment implements LocationListener,
 		}
 
 		else if (v.getId() == acceptBtn.getId()) {
-			
 			isOnTask = true;
 			acceptBtn.setVisibility(View.GONE);
 			declineBtn.setVisibility(View.VISIBLE);
-
 			updateViewForTaskAccept();
 		}
-
 	}
 
 	private void updateViewForTaskAbort() {
-		if (currentRoutePoly != null) {
-			currentRoutePoly.remove();
-		}
+		// TODO: display dialogbox to abort task
+		
+		timer.cancel();
+		
 		Log.d(TAG + "; Abort pressed", currentTask.toJSON().toString());
-
 	}
 
 	private void updateViewForTaskAccept() {
+		
+		// Show timer
+		currentTime = new Time();
+		currentTime.setToNow();
+		final long dl = currentTask.getDeadline().getTime();
+		final long ct = currentTime.toMillis(true);
+		
+		Log.d(TAG + " TIMER ", "" + (ct - dl));
+		
+		timerTextView = (TextView) rootView.findViewById(R.id.timerTextView);
+		timer = new CountDownTimer(ct - dl, 1000) {
+
+			public void onTick(long millisUntilFinished) {
+				String text = dateFormat.format((millisUntilFinished / 1000));
+				
+				long seconds = millisUntilFinished / 1000;
+				long minutes = seconds / 60;
+				long hours = minutes / 60;
+				long days = hours / 24;
+			
+				text = String.format("%02d:%02d:%02d:%02d",
+						TimeUnit.MILLISECONDS.toDays(millisUntilFinished),
+						
+						TimeUnit.MILLISECONDS.toHours(millisUntilFinished) -
+						TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays(millisUntilFinished)),
+						
+						TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) -  
+						TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
+						
+						TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - 
+						TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)));
+				timerTextView.setText(text);
+			}
+
+			public void onFinish() {
+				timerTextView.setText("done!");
+			}
+		}.start();
+
 		currentTask.setStatus(Task.TaskStatus.ACCEPTED);
 		currentTask.setWorkerId(currentUser.getId());
 		
@@ -459,42 +516,13 @@ public class WorkerView extends Fragment implements LocationListener,
 		Log.d(TAG , "accpeted a task");
 
 		new AsyncTask<Task, Void, Boolean>() {
-
 			@Override
 			protected Boolean doInBackground(Task... params) {
 				return TaskProvider.updateTask(params[0]);
 			}
-
-			@Override
-			protected void onPostExecute(Boolean result) {
-				if (result) {
-					// TODO
-					// Show task accept panel - DONE
-					// panle has timer, TODO
-					// get time to deadline from db TODO
-
-				}
-			};
-
 		}.execute(currentTask);
-
-		String pickUp = currentTask.getPickupAddress();
-		String dropOff = currentTask.getDropoffAddress();
-
-		new AsyncTask<String, Void, List<LatLng>>() {
-			@Override
-			protected List<LatLng> doInBackground(String... params) {
-				return RouteProvider.getRoute(params[0], params[1]);
-			}
-
-			@Override
-			protected void onPostExecute(List<LatLng> result) {
-				showRoute(result);
-			}
-		}.execute(pickUp, dropOff);
-
 	}
-
+	
 	@Override
 	public void onProviderDisabled(String provider) {
 	}
