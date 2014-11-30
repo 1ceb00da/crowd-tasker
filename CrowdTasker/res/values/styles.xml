@@ -11,7 +11,7 @@
             backward-compatibility can go here.
         -->
     </style>
-
+    
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
        <!-- <item name="android:actionBarStyle">@style/MyActionBar</item> --> 
@@ -23,6 +23,15 @@
     </style>
      -->
      
+     <style name="GeneralButton">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:capitalize">characters</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/general_button</item>
+    </style>
+    
     <style name="CTButton">
         <item name="android:layout_width">72sp</item>
         <item name="android:layout_height">wrap_content</item>

@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 
 
@@ -32,6 +33,7 @@ public class TaskerView extends Fragment implements UpdatableFragment{
 	public static final int UPDATE_INTERVAL = 10000; // Update interval in milliseconds
 	
 	private ListView taskListView;
+	private TextView taskListEmptyView;
 	private TaskListAdapter taskListAdapter;
 	private Button newTaskBtn;
 	
@@ -61,6 +63,9 @@ public class TaskerView extends Fragment implements UpdatableFragment{
         currentUser = UserProvider.getCurrentUser(getActivity());
         
         taskListView = (ListView)(rootView.findViewById(R.id.task_list_view));
+        taskListEmptyView = (TextView)(rootView.findViewById(R.id.task_list_empty_view));
+        taskListView.setEmptyView(taskListEmptyView);
+        
         taskListAdapter = new TaskListAdapter(getActivity(), currentUser, R.layout.task_list_item);
         taskListView.setAdapter(taskListAdapter);
         taskListView.setOnItemClickListener(new OnItemClickListener() {

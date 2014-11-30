@@ -3,19 +3,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
     
+	
+    
     <RelativeLayout android:layout_width="match_parent"
     		android:layout_height="wrap_content" 
-    		android:id="@+id/btn_wrapper">
-    	<TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-    	    android:id="@+id/title" android:textAppearance="?android:attr/textAppearanceMedium"
-    	    android:layout_marginTop="10dp" android:layout_marginLeft="10dp" android:textStyle="bold"/>    	    
-    		
-        <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="@string/ok" android:id="@+id/ok_btn"
-            android:layout_toLeftOf="@+id/cancel_btn"/>
-        <Button android:layout_width="wrap_content" 
-            android:layout_alignParentRight="true" android:layout_height="wrap_content"
-            android:text="@string/cancel" android:id="@+id/cancel_btn"/>
+    		android:id="@+id/btn_wrapper"
+    		 android:background="#00a4e1">
+    	
+    	<TextView android:id="@+id/title"
+	        android:layout_width="match_parent" android:layout_height="wrap_content" 
+	        android:paddingLeft="10dp"
+	        android:paddingRight="10dp"
+	        android:paddingBottom="7dp"
+	        android:paddingTop="5dp"
+	        android:textAppearance="?android:attr/textAppearanceLarge"
+	        android:textStyle="bold"
+	        android:layout_alignParentTop="true"
+	        android:background="#00a4e1"
+	        android:textColor="#FFFFFF"/> 
+    	
     </RelativeLayout>
     
      <FrameLayout  

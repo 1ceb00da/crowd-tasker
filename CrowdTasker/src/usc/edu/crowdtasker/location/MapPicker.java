@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 
 import usc.edu.crowdtasker.R;
+import usc.edu.crowdtasker.data.model.Task;
+import usc.edu.crowdtasker.tasker.NewTaskActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
@@ -15,6 +17,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -63,11 +68,13 @@ public class MapPicker extends FragmentActivity
 		setContentView(R.layout.map_picker_view);
 		mapWrapper = (FrameLayout)findViewById(R.id.map_wrapper);
 	    mapWrapper.setVisibility(View.INVISIBLE);
-	    okBtn = (Button) findViewById(R.id.ok_btn);
-	    cancelBtn = (Button) findViewById(R.id.cancel_btn);
+	    //okBtn = (Button) findViewById(R.id.ok_btn);
+	    //cancelBtn = (Button) findViewById(R.id.cancel_btn);
 	    titleView = (TextView) findViewById(R.id.title);
 	    
-	    okBtn.setOnClickListener(new OnClickListener() {
+	    
+	    
+	   /* okBtn.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -81,7 +88,7 @@ public class MapPicker extends FragmentActivity
 				setResult(RESULT_CANCELED);
 				finish();
 			}
-		});
+		});*/
 	    
 	    Bundle extras = getIntent().getExtras();
 	    if(extras != null){
@@ -103,6 +110,27 @@ public class MapPicker extends FragmentActivity
 			locationManager.removeUpdates(this);
 		super.onStop();
 	}
+	
+	@Override
+	 public boolean onCreateOptionsMenu(Menu menu) {
+	     // Inflate the menu items for use in the action bar
+	     MenuInflater inflater = getMenuInflater();
+	     inflater.inflate(R.menu.map_picker_actions, menu);
+	     return super.onCreateOptionsMenu(menu);
+	 }
+	 
+	 @Override
+	 public boolean onOptionsItemSelected(MenuItem item) {
+		
+	     // Handle presses on the action bar items
+	     switch (item.getItemId()) {
+	         case R.id.action_save:
+	        	pickLocation();
+	            return true;
+	         default:
+	             return super.onOptionsItemSelected(item);
+	     }
+	 }
 
 	/**
 	 * Sets up the map if it is possible to do so (i.e., the Google Play

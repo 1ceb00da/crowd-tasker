@@ -325,7 +325,7 @@ public class TaskStatusActivity extends FragmentActivity{
 				LatLng workerLatLng = new LatLng(currentTask.getWorkerLocation()[0], 
 						currentTask.getWorkerLocation()[1]);
 				opt.position(workerLatLng);
-				opt.icon(BitmapDescriptorFactory.fromResource(R.drawable.ironman_64));
+				opt.icon(BitmapDescriptorFactory.fromResource(R.drawable.worker));
 				mMap.addMarker(opt);	
 	    	}
 	    	
