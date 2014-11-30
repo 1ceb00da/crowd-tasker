@@ -1,11 +1,31 @@
 package usc.edu.crowdtasker.data.provider;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,6 +33,9 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -150,6 +173,57 @@ public class UserProvider extends DataProvider {
 		editor.remove(context.getString(R.string.pref_username));
 		editor.remove(context.getString(R.string.pref_userid));
 		editor.commit();
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static boolean uploadProfilePicture(User user, Bitmap bitmap){
+		String url = SERVICE_URL + "/upload/profile";
+		try{
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	        bitmap.compress(CompressFormat.JPEG, 75, bos);
+	        byte[] data = bos.toByteArray();
+	        HttpClient httpClient = new DefaultHttpClient();
+	        HttpPost postRequest = new HttpPost(url);
+	        ByteArrayBody bab = new ByteArrayBody(data, user.getLogin()+".jpg");
+	       
+	        MultipartEntityBuilder meb = MultipartEntityBuilder.create();
+	        meb.addPart("picture", bab);
+	        meb.addPart("user_id", new StringBody(user.getId().toString()));
+	        postRequest.setEntity(meb.build());
+	        HttpResponse response = httpClient.execute(postRequest);
+	        BufferedReader reader = new BufferedReader(new InputStreamReader(
+	                response.getEntity().getContent(), "UTF-8"));
+	        String sResponse;
+	        StringBuilder s = new StringBuilder();
+	
+	        while ((sResponse = reader.readLine()) != null) {
+	            s = s.append(sResponse);
+	        }
+	        return s.toString().equals(RESULT_OK);
+		}catch(Exception e){
+			Log.e(TAG, e.getMessage());
+		}
+        
+        return false;
+	}
+	
+	public static Bitmap getProfilePic(User user) {
+		if(user == null || user.getProfilePic() == null)
+			return null;
+	    try {
+	    	String uri = SERVICE_URL + "/" + user.getProfilePic();
+
+	        URL url = new URL(uri);
+	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	        connection.setDoInput(true);
+	        connection.connect();
+	        InputStream input = connection.getInputStream();
+	        Bitmap myBitmap = BitmapFactory.decodeStream(input);
+	        return myBitmap;
+	    } catch (IOException e) {
+	    	Log.e(TAG, e.getMessage());
+	        return null;
+	    }
 	}
 	
 }

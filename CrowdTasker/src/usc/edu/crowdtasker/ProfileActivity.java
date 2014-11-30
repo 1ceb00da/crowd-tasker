@@ -1,6 +1,7 @@
 package usc.edu.crowdtasker;
 
 import usc.edu.crowdtasker.data.model.User;
+import usc.edu.crowdtasker.data.provider.DataProvider;
 import usc.edu.crowdtasker.data.provider.UserProvider;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -37,6 +38,7 @@ public class ProfileActivity extends Activity {
 	private ImageView profilePicture;
 	
 	private ProgressDialog progressDialog;
+	private Bitmap currentProfilePic;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,21 +56,27 @@ public class ProfileActivity extends Activity {
 		ratingBar.setActivated(false);
 		
 		progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getString(R.string.saving_profile));
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setCancelable(false);
         
 		if(currentUser != null){
 			username.setText(currentUser.getLogin());
+	        progressDialog.setMessage(getString(R.string.loading_profile));
+	        progressDialog.show();
 			new AsyncTask<Long, Void, User>() {
 
 				@Override
 				protected User doInBackground(Long... params) {
-					return UserProvider.getUserById(params[0]);
+					User user = UserProvider.getUserById(params[0]);
+					currentProfilePic = UserProvider.getProfilePic(user);
+					return user;
 				}
 				
 				@Override
 				protected void onPostExecute(User result) {
+					progressDialog.dismiss();
+					if(result == null)
+						return;
 					currentUser = result;
 					if(result.getEmail() != null)
 						email.setText(result.getEmail());
@@ -78,6 +86,8 @@ public class ProfileActivity extends Activity {
 						lastName.setText(result.getLastName());
 					if(result.getRating() != null)
 						ratingBar.setRating(result.getRating().floatValue());
+					if(currentProfilePic != null)
+						setProfilePic(currentProfilePic);
 				}
 			}.execute(currentUser.getId());
 			
@@ -96,6 +106,8 @@ public class ProfileActivity extends Activity {
 					currentUser.setFirstName(firstName.getText().toString());
 					currentUser.setLastName(lastName.getText().toString());
 					currentUser.setEmail(email.getText().toString());
+			        progressDialog.setMessage(getString(R.string.saving_profile));
+
 					new AsyncTask<User, Void, Boolean>(){
 						protected void onPreExecute() {
 							progressDialog.show();
@@ -121,7 +133,16 @@ public class ProfileActivity extends Activity {
 		
 	}
 	
-	
+	private Bitmap setProfilePic(Bitmap pic){
+		 double max = Math.max(pic.getHeight(), pic.getWidth());
+         double factor = profilePicture.getWidth() / max ;
+         Bitmap scaledBmp = Bitmap.createScaledBitmap(pic, 
+         		(int)(factor * pic.getWidth()), 
+         		(int)(factor * pic.getHeight()), false);
+         profilePicture.setImageBitmap(scaledBmp);
+         
+         return scaledBmp;
+	}
 	protected void onActivityResult(int requestCode, int resultCode, 
 		       Intent imageReturnedIntent) {
 		    super.onActivityResult(requestCode, resultCode, imageReturnedIntent); 
@@ -140,15 +161,16 @@ public class ProfileActivity extends Activity {
 		            cursor.close();
 		            
 		            Bitmap selectedBmp = BitmapFactory.decodeFile(filePath);
-		            double max = Math.max(profilePicture.getHeight(), profilePicture.getWidth());
+		            currentProfilePic = setProfilePic(selectedBmp);
 		            
-		            double factor = PROFILE_PIC_DIM / max ;
-		            
-		            Bitmap scaledBmp = Bitmap.createScaledBitmap(selectedBmp, 
-		            		(int)(factor * profilePicture.getWidth()), 
-		            		(int)(factor * profilePicture.getHeight()), false);
+		            new AsyncTask<Bitmap, Void, Boolean>(){
 
-		            profilePicture.setImageBitmap(scaledBmp);
+						@Override
+						protected Boolean doInBackground(Bitmap... params) {
+							return UserProvider.uploadProfilePicture(currentUser, params[0]);
+						}
+		            	
+		            }.execute(currentProfilePic);
 		        }
 		        
 		    }

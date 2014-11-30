@@ -19,6 +19,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.RatingBar.OnRatingBarChangeListener;
@@ -75,6 +77,9 @@ public class TaskStatusActivity extends FragmentActivity{
     private Marker currentWorkerMarker;
     private ProgressDialog progressDialog;
     
+    private ImageView workerPicture;
+    private Bitmap currentWorkerPic;
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -90,6 +95,7 @@ public class TaskStatusActivity extends FragmentActivity{
 		deadline = (TextView)findViewById(R.id.deadline);
 		workerView = (TextView)findViewById(R.id.worker);
 		workerRatingBar = (RatingBar)findViewById(R.id.worker_rating_bar);
+		workerPicture = (ImageView)findViewById(R.id.worker_picture);
 		
 		createdView = (TextView)findViewById(R.id.status_created);
 		acceptedView = (TextView)findViewById(R.id.status_accepted);
@@ -281,7 +287,9 @@ public class TaskStatusActivity extends FragmentActivity{
 
 					@Override
 					protected User doInBackground(Long... params) {
-						return UserProvider.getUserById(params[0]);
+						User user = UserProvider.getUserById(params[0]);
+						currentWorkerPic = UserProvider.getProfilePic(user);
+						return user;
 					}
 					
 					@Override
@@ -305,6 +313,9 @@ public class TaskStatusActivity extends FragmentActivity{
 							workerView.setText(R.string.not_assigned);
 							workerRatingBar.setVisibility(View.INVISIBLE);
 						}
+						if(currentWorkerPic != null)
+							setWorkerPic(currentWorkerPic);
+						
 						if(progressDialog.isShowing())
 							progressDialog.dismiss();
 					}
@@ -330,6 +341,17 @@ public class TaskStatusActivity extends FragmentActivity{
 	    	}
 	    	
 	 }
+	 
+	 private Bitmap setWorkerPic(Bitmap pic){
+		 double max = Math.max(pic.getHeight(), pic.getWidth());
+         double factor = workerPicture.getWidth() / max ;
+         Bitmap scaledBmp = Bitmap.createScaledBitmap(pic, 
+         		(int)(factor * pic.getWidth()), 
+         		(int)(factor * pic.getHeight()), false);
+         workerPicture.setImageBitmap(scaledBmp);
+         
+         return scaledBmp;
+	}
 	 
 	 private void showRoute( List<LatLng> routePoints) {
 	        if (currentRoutePoly != null)

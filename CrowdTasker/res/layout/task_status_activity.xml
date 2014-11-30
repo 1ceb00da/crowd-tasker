@@ -26,6 +26,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/task_name"
+        android:layout_toLeftOf="@+id/worker_picture"
+        android:layout_alignParentLeft="true"
         android:layout_marginBottom="3dp"
         android:text="@string/description" />
 
@@ -109,12 +111,23 @@
       -->
     <RatingBar android:id="@+id/worker_rating_bar"  
        	  style = "?android:attr/ratingBarStyleSmall"
-          android:layout_below="@+id/payment_wrapper"
-		  android:layout_toRightOf="@+id/worker_wrapper"
+          android:layout_below="@+id/worker_picture"
           android:layout_width="wrap_content" android:layout_height="wrap_content" 
-          android:layout_marginTop="10dp"
           android:layout_marginLeft="3dp"
+          android:layout_marginRight="10dp"
+          android:layout_marginTop="3dp"
+    	  android:layout_alignParentRight="true"
           android:visibility="invisible"/>
+    
+    <ImageView
+        android:id="@+id/worker_picture"
+    	android:layout_height="100dp"
+    	android:layout_width="100dp"
+    	android:src="@drawable/profile_pic_placeholder"
+    	android:layout_alignParentRight="true"
+    	android:layout_below="@+id/task_name"
+    	android:layout_marginTop="4dp" 
+    	android:layout_marginRight="4dp"/>
     
     
     <LinearLayout
@@ -122,9 +135,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/worker_wrapper"
+        android:layout_below="@+id/worker_rating_bar"
         android:orientation="horizontal"
-        android:layout_marginTop="5dp" 
+        android:layout_marginTop="1dp" 
         android:gravity="center_vertical"
         android:visibility="gone">
          <TextView
@@ -187,7 +200,7 @@
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="1dp"
         android:layout_alignParentBottom="true"
         android:layout_below="@+id/main_wrapper"
         class="com.google.android.gms.maps.MapFragment" />

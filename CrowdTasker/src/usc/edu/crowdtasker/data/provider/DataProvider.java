@@ -35,7 +35,7 @@ public class DataProvider {
 	public static final String RESULT_FAIL = "fail";
 	
 	
-	protected final static String SERVICE_URL = "http://csci587team12.cloudapp.net";
+	public final static String SERVICE_URL = "http://csci587team12.cloudapp.net";
 	
 	public final static String DATE_FORMAT = "yyyy-MM-dd HH:mm";
 
@@ -117,4 +117,6 @@ public class DataProvider {
         Log.i("RESTCALL", result);  
         return result;
 	 } // end callWebService()  
+	
+	
 }

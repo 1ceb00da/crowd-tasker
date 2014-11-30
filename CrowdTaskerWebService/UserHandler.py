@@ -1,3 +1,5 @@
+import sys
+import os
 from ObjectHandler import ObjectHandler
 
 class UserHandler(ObjectHandler):
@@ -68,7 +70,7 @@ class UserHandler(ObjectHandler):
     def get_users(self, params):
         
         sql = "SELECT u.ID, u.PASS, u.LOGIN, u.EMAIL, u.FIRST_NAME, u.LAST_NAME, u.IMEI, " \
-              "AVG(r.rating) AS RATING FROM USERS u LEFT JOIN RATINGS r ON u.id = r.to_id " 
+              "u.PROFILE_PIC, AVG(r.rating) AS RATING FROM USERS u LEFT JOIN RATINGS r ON u.id = r.to_id " 
               
         
         values = ()
@@ -82,7 +84,8 @@ class UserHandler(ObjectHandler):
                     sql += " AND "
                 values = values + (params[key],)
                 i += 1
-        sql += " GROUP BY u.ID, u.PASS, u.LOGIN, u.EMAIL, u.FIRST_NAME, u.LAST_NAME, u.IMEI"
+        sql += " GROUP BY u.ID, u.PASS, u.LOGIN, u.EMAIL, u.FIRST_NAME, " \
+               " u.LAST_NAME, u.IMEI, u.PROFILE_PIC"
         
         conn = self.conn_provider.get_db_connection()
         cursor = conn.cursor()
@@ -93,5 +96,35 @@ class UserHandler(ObjectHandler):
         conn.close()
         
         return ObjectHandler.to_json(self, data)
+    
+    def save_profile_picture(self, upload, user_id):
+        if upload is not None:
+            name, ext = os.path.splitext(upload.filename)
+
+            if ext not in ('.png','.jpg','.jpeg'):
+                return "fail"
+
+            save_path = "uploads"
+            if not os.path.exists(save_path):
+                os.makedirs(save_path)
+
+            file_path = "{path}/{file}".format(path=save_path, file=upload.filename)
+
+            with open(file_path, 'wb') as open_file:
+                open_file.write(upload.file.read())
+                
+            sql = "UPDATE USERS SET PROFILE_PIC=:1 WHERE ID=:2"
+            values = (file_path, user_id)
+        
+            conn = self.conn_provider.get_db_connection()
+            cursor = conn.cursor()
+            r = cursor.execute(sql, values)
+            conn.commit()
+            cursor.close()
+            conn.close()
+                
+            return "ok"
+        else:
+            return "fail"
 
   

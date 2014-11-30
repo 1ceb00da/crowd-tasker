@@ -38,6 +38,8 @@ public class User extends JSONBase{
 	public static final String RATING_COL = "RATING";
 	private Double rating;
 	
+	public static final String PROFILE_PIC_COL = "PROFILE_PIC";
+	private String profilePic;
 	
 	/**
 	 * @return the login
@@ -119,6 +121,18 @@ public class User extends JSONBase{
 	public void setRating(Double rating) {
 		this.rating = rating;
 	}
+	/**
+	 * @return the profilePic
+	 */
+	public String getProfilePic() {
+		return profilePic;
+	}
+	/**
+	 * @param profilePic the profilePic to set
+	 */
+	public void setProfilePic(String profilePic) {
+		this.profilePic = profilePic;
+	}
 	@Override
 	public JSONObject toJSON() {
 		try{
@@ -164,6 +178,9 @@ public class User extends JSONBase{
 			
 			if(!jsonObject.isNull(RATING_COL))
 				setRating(jsonObject.getDouble(RATING_COL));
+			
+			if(!jsonObject.isNull(PROFILE_PIC_COL))
+				setProfilePic(jsonObject.getString(PROFILE_PIC_COL));
 		} catch (JSONException e) {
 			Log.e(TAG, "fromJSON JSONException: " + e.getMessage());
 			return false;
