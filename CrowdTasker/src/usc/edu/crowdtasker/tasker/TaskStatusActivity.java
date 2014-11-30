@@ -107,7 +107,6 @@ public class TaskStatusActivity extends FragmentActivity{
 					newRating.setToId(currentWorker.getId());
 					newRating.setTaskId(currentTask.getId());
 					newRating.setRating(rating);
-					System.err.println("RTCH "+currentTask.getRating() + " "+rating);
 					new AsyncTask<Rating, Void, Boolean>(){
 						@Override
 						protected Boolean doInBackground(Rating... params) {
@@ -163,7 +162,6 @@ public class TaskStatusActivity extends FragmentActivity{
 							if(task == null)
 								return;
 							
-							System.err.println("TTT "+task.getRating());
 							if(currentTask == null){
 								currentTask = task;
 								setFieldsFromTask();
@@ -378,6 +376,7 @@ public class TaskStatusActivity extends FragmentActivity{
 	         case R.id.action_edit:
 	        	 Intent editIntent = new Intent(getApplicationContext(), NewTaskActivity.class);
 	        	 editIntent.putExtra(Task.ID_COL, currentTask.getId());
+	        	 currentTask = null;
 	        	 startActivity(editIntent);
 	             return true;
 	             

@@ -3,21 +3,33 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:padding="10dp" >
+    
+     <ImageView
+        android:id="@+id/logo"
+    	android:layout_height="wrap_content"
+    	android:layout_width="wrap_content"
+       	android:layout_marginBottom="10dp"
+       	android:layout_marginTop="5dp"
+       	android:layout_alignParentTop="true"
+       	android:layout_centerHorizontal="true"
+    	android:src="@drawable/logo"
+    	 />
 
      <TextView 
+            android:id="@+id/register_tv"
 	        android:text="@string/register" 
 	        android:layout_width="wrap_content" android:layout_height="wrap_content" 
-	        android:layout_marginBottom="5dp"
+	        android:layout_marginBottom="2dp"
 	        android:textAppearance="?android:attr/textAppearanceLarge"
 	        android:textStyle="bold"
 	        android:layout_centerHorizontal="true"
-	        android:layout_above="@+id/username"/> 
+	        android:layout_below="@+id/logo"/> 
 	        
     <EditText android:hint="@string/username_hint" android:id="@+id/username"
 			  android:layout_width="match_parent" android:layout_height="wrap_content" 
 	          android:layout_marginBottom="3dp" 
-    	      android:layout_centerInParent="true"
-    	      android:layout_above="@+id/password"
+    	      android:layout_centerHorizontal="true"
+    	      android:layout_below="@+id/register_tv"
     	      android:singleLine="true"/>
 			    
     <EditText android:hint="@string/password_hint" android:id="@+id/password"
@@ -25,14 +37,16 @@
 	          android:layout_marginBottom="3dp" 
     	      android:inputType="textPassword"
     	      android:singleLine="true"
-    	      android:layout_above="@+id/password_repeat"
+    	      android:layout_below="@+id/username"
     	      />
     <EditText android:hint="@string/password_repeat_hint" android:id="@+id/password_repeat"
 			  android:layout_width="match_parent" android:layout_height="wrap_content" 
 	          android:layout_marginBottom="3dp" 
-	          android:layout_centerInParent="true"
+	          android:layout_centerHorizontal="true"
 	          android:inputType="textPassword"
+	          android:layout_below="@+id/password"
     	      android:singleLine="true"/>
+    
      <EditText android:hint="@string/email_hint" android:id="@+id/email"
 			  android:layout_width="match_parent" android:layout_height="wrap_content" 
 	          android:layout_marginBottom="3dp" 

@@ -17,6 +17,7 @@ import usc.edu.crowdtasker.location.MapPicker;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -58,6 +59,8 @@ public class NewTaskActivity extends Activity {
 	
 	private DateFormat dateFormat;
 	private NumberFormat moneyFormat;
+	
+	private ProgressDialog progressDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {  
@@ -80,29 +83,38 @@ public class NewTaskActivity extends Activity {
        fieldsWrapper = (RelativeLayout) findViewById(R.id.new_task_field_wrapper);
        createBtn = (Button) findViewById(R.id.create_btn);
        
+   	   progressDialog = new ProgressDialog(this);
+   	   progressDialog.setCanceledOnTouchOutside(false);
+   	   progressDialog.setCancelable(false);
        
        Bundle extras = getIntent().getExtras();
        currentTask = new Task();
        if(extras != null && extras.containsKey(Task.ID_COL)){
+
     	   headerTitleTv.setText(R.string.edit_task);
 		   createBtn.setText(R.string.save);
 		   fieldsWrapper.setVisibility(View.INVISIBLE);
 		   
+    	   progressDialog.setMessage(getString(R.string.loading_task));
+    	   progressDialog.show();
+    	   
     	   new AsyncTask<Long, Void, Task>(){
     		   
-			@Override
-			protected Task doInBackground(Long... params) {
-		    	  return TaskProvider.getTaskById(params[0]);
-			}
-			
-			@Override
-			protected void onPostExecute(Task task) {
-				if(task != null){
-					currentTask = task;
-					setFieldsFromTask();
+				@Override
+				protected Task doInBackground(Long... params) {
+			    	  return TaskProvider.getTaskById(params[0]);
 				}
-				fieldsWrapper.setVisibility(View.VISIBLE);
-			}  
+				
+				@Override
+				protected void onPostExecute(Task task) {
+					progressDialog.dismiss();
+					if(task != null){
+						currentTask = task;
+						setFieldsFromTask();
+	
+					}
+					fieldsWrapper.setVisibility(View.VISIBLE);
+				}  
 			
     	   }.execute(extras.getLong(Task.ID_COL));
        }
@@ -235,6 +247,8 @@ public class NewTaskActivity extends Activity {
     
     
     private void createOrEditTask(){
+    	
+	   
     	User owner = UserProvider.getCurrentUser(getApplicationContext());
     	
     	currentTask.setName(nameEt.getText().toString());
@@ -266,7 +280,12 @@ public class NewTaskActivity extends Activity {
 			}
     	}else currentTask.setPayment(null);
     	
-    	currentTask.setStatus(TaskStatus.CREATED);
+    	if(currentTask.getStatus() == null)
+    		currentTask.setStatus(TaskStatus.CREATED);
+    	
+    	progressDialog.setMessage(getString(R.string.saving_task));
+	   	progressDialog.show();
+	   	
     	new AsyncTask<Void, Void, Boolean>() {
 
 			@Override
@@ -278,6 +297,7 @@ public class NewTaskActivity extends Activity {
 			
 			@Override
 			protected void onPostExecute(Boolean result) {
+				progressDialog.dismiss();
 				if(currentTask.getId() == null){
 		    		if(result){
 		        		Toast.makeText(getApplicationContext(), 
@@ -302,6 +322,7 @@ public class NewTaskActivity extends Activity {
     }
     
     private void setFieldsFromTask(){
+
     	if(currentTask.getName() != null)
     		nameEt.setText(currentTask.getName());
     	

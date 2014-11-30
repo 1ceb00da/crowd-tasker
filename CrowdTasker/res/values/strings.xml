@@ -116,9 +116,12 @@
 	<string name="profile_update_success">Profile successfully updated.</string>
 	<string name="profile_update_error">Error: profile could not be updated.</string>
 	<string name="loading_tasks">Loading tasks&#8230;</string>
+	<string name="loading_task">Loading task&#8230;</string>
 	<string name="loading_task_status">Loading task status&#8230;</string>
 	<string name="saving_profile">Saving profile&#8230;</string>
+	<string name="saving_task">Saving task&#8230;</string>
 	<string name="rate_task">Rate it!</string>
 	
 	<string name="task_rate_error">Error: rating could not be updated</string>
+	
 </resources>

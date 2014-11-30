@@ -98,7 +98,10 @@ public class TaskerView extends Fragment implements UpdatableFragment{
     
     @Override
     public void onDestroyView() {
-    	updateTimer.cancel();
+    	if(updateTimer != null){
+    		updateTimer.cancel();
+        	updateTimer.purge();
+    	}
     	super.onDestroyView();
     }
 

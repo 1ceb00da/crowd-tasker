@@ -4,18 +4,28 @@ import usc.edu.crowdtasker.data.model.User;
 import usc.edu.crowdtasker.data.provider.UserProvider;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import android.widget.RatingBar;
 
 public class ProfileActivity extends Activity {
+	
+	public static final int SELECT_PICTURE = 1;
+	public static final double PROFILE_PIC_DIM = 180.0;
 	private User currentUser;
 	
 	private TextView username;
@@ -24,6 +34,7 @@ public class ProfileActivity extends Activity {
 	private EditText email;
 	private RatingBar ratingBar;
 	private Button saveBtn;
+	private ImageView profilePicture;
 	
 	private ProgressDialog progressDialog;
 	
@@ -39,6 +50,7 @@ public class ProfileActivity extends Activity {
 		email = (EditText)findViewById(R.id.email);
 		saveBtn = (Button)findViewById(R.id.save_btn);
 		ratingBar = (RatingBar)findViewById(R.id.rating_bar);
+		profilePicture = (ImageView) findViewById(R.id.profile_picture);
 		ratingBar.setActivated(false);
 		
 		progressDialog = new ProgressDialog(this);
@@ -68,6 +80,15 @@ public class ProfileActivity extends Activity {
 						ratingBar.setRating(result.getRating().floatValue());
 				}
 			}.execute(currentUser.getId());
+			
+			profilePicture.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+					photoPickerIntent.setType("image/*");
+					startActivityForResult(photoPickerIntent, SELECT_PICTURE);    
+				}
+			});
 			
 			saveBtn.setOnClickListener(new OnClickListener() {
 				@Override
@@ -99,5 +120,38 @@ public class ProfileActivity extends Activity {
 		}
 		
 	}
+	
+	
+	protected void onActivityResult(int requestCode, int resultCode, 
+		       Intent imageReturnedIntent) {
+		    super.onActivityResult(requestCode, resultCode, imageReturnedIntent); 
+
+		    switch(requestCode) { 
+		    case SELECT_PICTURE:
+		        if(resultCode == RESULT_OK){  
+		            Uri selectedImage = imageReturnedIntent.getData();
+		            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+		            Cursor cursor = getContentResolver().query(
+		                               selectedImage, filePathColumn, null, null, null);
+		            cursor.moveToFirst();
+		            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+		            String filePath = cursor.getString(columnIndex);
+		            cursor.close();
+		            
+		            Bitmap selectedBmp = BitmapFactory.decodeFile(filePath);
+		            double max = Math.max(profilePicture.getHeight(), profilePicture.getWidth());
+		            
+		            double factor = PROFILE_PIC_DIM / max ;
+		            
+		            Bitmap scaledBmp = Bitmap.createScaledBitmap(selectedBmp, 
+		            		(int)(factor * profilePicture.getWidth()), 
+		            		(int)(factor * profilePicture.getHeight()), false);
+
+		            profilePicture.setImageBitmap(scaledBmp);
+		        }
+		        
+		    }
+		}
 
 }

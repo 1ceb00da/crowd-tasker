@@ -90,7 +90,7 @@ class TaskHandler(ObjectHandler):
             sql += ",WORKER_LOC=SDO_GEOMETRY(2001,8307, SDO_POINT_TYPE(:14, :15, NULL),NULL,NULL)"
             values = values + (params['WORKER_LOC_LAT'], params['WORKER_LOC_LONG'])
         else:
-            sql += ",DROPOFF_LOC=NULL"
+            sql += ",WORKER_LOC=NULL"
         
         sql += " WHERE ID = :16"
         values = values + (params["ID"],)

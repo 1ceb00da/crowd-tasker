@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    
+<RelativeLayout 
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:padding="10dp"
-    android:paddingTop="5dp" >
+    android:paddingTop="5dp"
+    android:layout_alignParentTop="true" 
+    android:id="@+id/main_wrapper">
 
     <TextView
         android:id="@+id/task_name"
@@ -176,13 +182,14 @@
             android:focusableInTouchMode="false"
             android:visibility="gone" />
     </FrameLayout>
-
-    <fragment
+</RelativeLayout>
+ <fragment
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/rate_task_wrapper"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="2dp"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/main_wrapper"
         class="com.google.android.gms.maps.MapFragment" />
-
-</RelativeLayout>
+ </RelativeLayout>
+ 
