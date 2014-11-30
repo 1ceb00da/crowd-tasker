@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,6 +35,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -50,10 +52,11 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import usc.edu.crowdtasker.data.provider.RouteProvider;
+import usc.edu.crowdtasker.worker.TaskCompletionDialogFragment.OnFinishListener;
 
 public class WorkerView extends Fragment implements LocationListener,
 		OnMarkerClickListener, OnMapClickListener, UpdatableFragment,
-		OnClickListener {
+		OnClickListener, OnFinishListener{
 
 	public static final String TAG = "WorkerView";
 
@@ -247,19 +250,23 @@ public class WorkerView extends Fragment implements LocationListener,
 			
 			double currentLat = location.getLatitude();
 			double currentLon = location.getLongitude();
+
+			// Check differnece between latllong of dest at 4th decimal place
+			// the 4th decimal place is accurate upto 11m
 			
-			if (dropOffLat == currentLat && 
-				dropOffLon == currentLon) {
-				// update database
-				// TODO Update database
+			double currentLoc[] = new double[]{currentLat, currentLon};
+			double dropOffLoc[] = new double[]{dropOffLat, dropOffLon};
+			
+			if (isCloseTo(currentLoc, dropOffLoc)) {
+				Log.d(TAG, "Approaching destination");
+				showTaskCompletionDialog();
 			}
 			else {
 				if (currentLocationMarker == null) {
 					// TODO display a moving marker
 				}
 			}
-			
-			Log.d(TAG, "isOnTask, location update");
+			Log.d(TAG, "cur =" + currentLoc[0] + "," + currentLoc[1] + ";;;, des =" + dropOffLoc[0] + "," + dropOffLoc[1]);
 		}
 		
 		if (!locationInitialized) {
@@ -272,6 +279,72 @@ public class WorkerView extends Fragment implements LocationListener,
 			locationInitialized = true;
 			update();
 		}
+	}
+	
+	private boolean showingTaskCompletionDialog = false;
+	private void showTaskCompletionDialog() {
+		if (showingTaskCompletionDialog) {
+			return;
+		}
+		else {
+			FragmentManager fragmentManager = getFragmentManager();
+			TaskCompletionDialogFragment TaskCompletionDialog = new TaskCompletionDialogFragment(currentTask, this);
+			TaskCompletionDialog.setCancelable(false);
+			TaskCompletionDialog.setDialogTitle("Looks like you're near the destination");
+			TaskCompletionDialog.show(fragmentManager, "Yes/No Dialog");
+			showingTaskCompletionDialog = true;	
+		}
+		
+	}
+	public void onFinish(boolean completionResult) {
+		if (completionResult) {
+			currentTask.setStatus(Task.TaskStatus.COMPLETED);
+		}
+		else {
+			//TODO : Handle task not comepleted state
+			// possible reaon for task incomepletion maybe 
+			// destination not present, destination not opened door 
+			// etc
+			
+			// TEMP - set task as created
+			currentTask.setStatus(Task.TaskStatus.CANCELED);
+			// TODO:Display form for greivance or why task want not completed
+		}
+		new AsyncTask<Task, Void, Boolean>() {
+			@Override
+			protected Boolean doInBackground(Task... params) {
+				return TaskProvider.updateTask(params[0]);
+			}
+			@Override
+			protected void onPostExecute(Boolean p) {
+				
+			}
+			
+		}.execute(currentTask);
+		
+		
+		// update view
+		isOnTask = false;
+		rootView.findViewById(R.id.accpetTaskBtn).setVisibility(View.VISIBLE);
+		rootView.findViewById(R.id.declineTaskBtn).setVisibility(View.GONE);
+		timer.cancel();
+		String res = completionResult ? "Completed" : "Cancelled";
+		
+		Toast.makeText(getActivity(), "Task " + res, Toast.LENGTH_LONG).show();;
+				timerTextView.setText("");
+	}
+	
+	
+	private boolean isCloseTo(double[] currentLoc, double[] dropOffLoc) {
+		double diffLat = currentLoc[0] - dropOffLoc[0];
+		double diffLon = currentLoc[1] - dropOffLoc[1];
+		
+		Log.d(TAG, "Math.abs(diffLat)=" + Math.abs(diffLat) + ", Math.abs(diffLon)=" + Math.abs(diffLon));
+		
+		if ((Math.abs(diffLat) < 0.001) && (Math.abs(diffLon) < 0.001)) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -454,6 +527,7 @@ public class WorkerView extends Fragment implements LocationListener,
 
 		else if (v.getId() == acceptBtn.getId()) {
 			isOnTask = true;
+			showingTaskCompletionDialog = false;
 			acceptBtn.setVisibility(View.GONE);
 			declineBtn.setVisibility(View.VISIBLE);
 			updateViewForTaskAccept();
@@ -464,7 +538,6 @@ public class WorkerView extends Fragment implements LocationListener,
 		// TODO: display dialogbox to abort task
 		
 		timer.cancel();
-		
 		Log.d(TAG + "; Abort pressed", currentTask.toJSON().toString());
 	}
 
@@ -520,6 +593,7 @@ public class WorkerView extends Fragment implements LocationListener,
 			protected Boolean doInBackground(Task... params) {
 				return TaskProvider.updateTask(params[0]);
 			}
+			
 		}.execute(currentTask);
 	}
 	
@@ -546,4 +620,5 @@ public class WorkerView extends Fragment implements LocationListener,
 		// TODO Auto-generated method stub
 		
 	}
+
 }
