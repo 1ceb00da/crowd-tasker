@@ -1,5 +1,9 @@
 package usc.edu.crowdtasker;
 
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import usc.edu.crowdtasker.data.model.User;
 import usc.edu.crowdtasker.data.provider.DataProvider;
 import usc.edu.crowdtasker.data.provider.UserProvider;
@@ -12,7 +16,9 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -24,6 +30,8 @@ import android.widget.Toast;
 import android.widget.RatingBar;
 
 public class ProfileActivity extends Activity {
+	
+	public static final String TAG = "ProfileActivity";
 	
 	public static final int SELECT_PICTURE = 1;
 	public static final double PROFILE_PIC_DIM = 180.0;
@@ -134,6 +142,8 @@ public class ProfileActivity extends Activity {
 	}
 	
 	private Bitmap setProfilePic(Bitmap pic){
+		if(pic == null)
+			return null;
 		 double max = Math.max(pic.getHeight(), pic.getWidth());
          double factor = profilePicture.getWidth() / max ;
          Bitmap scaledBmp = Bitmap.createScaledBitmap(pic, 
@@ -150,27 +160,41 @@ public class ProfileActivity extends Activity {
 		    switch(requestCode) { 
 		    case SELECT_PICTURE:
 		        if(resultCode == RESULT_OK){  
-		            Uri selectedImage = imageReturnedIntent.getData();
-		            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+		        
+		        	ParcelFileDescriptor parcelFD = null;
+		        	try {
+			            Uri selectedUri = imageReturnedIntent.getData();
+		        		parcelFD = getContentResolver().openFileDescriptor(selectedUri, "r");
+		        	    FileDescriptor imageSource = parcelFD.getFileDescriptor();
 
-		            Cursor cursor = getContentResolver().query(
-		                               selectedImage, filePathColumn, null, null, null);
-		            cursor.moveToFirst();
-		            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-		            String filePath = cursor.getString(columnIndex);
-		            cursor.close();
-		            
-		            Bitmap selectedBmp = BitmapFactory.decodeFile(filePath);
-		            currentProfilePic = setProfilePic(selectedBmp);
-		            
-		            new AsyncTask<Bitmap, Void, Boolean>(){
+		        	    BitmapFactory.Options o = new BitmapFactory.Options();
+	        	        Bitmap selectedBmp = BitmapFactory.decodeFileDescriptor(imageSource, null, o);
+	        	        
+			            currentProfilePic = setProfilePic(selectedBmp);
+			            if(currentProfilePic == null)
+			            	Toast.makeText(getApplicationContext(),
+			            			R.string.profile_pic_error, Toast.LENGTH_LONG).show();
+			            
+			            new AsyncTask<Bitmap, Void, Boolean>(){
 
-						@Override
-						protected Boolean doInBackground(Bitmap... params) {
-							return UserProvider.uploadProfilePicture(currentUser, params[0]);
-						}
-		            	
-		            }.execute(currentProfilePic);
+							@Override
+							protected Boolean doInBackground(Bitmap... params) {
+								return UserProvider.uploadProfilePicture(currentUser, params[0]);
+							}
+			            	
+			            }.execute(currentProfilePic);
+		        	        
+	        	    } catch (FileNotFoundException e) {
+	        	    	Log.e(TAG, e.getMessage());
+	        	    } finally {
+	        	        if (parcelFD != null){
+	        	            try {
+	        	                parcelFD.close();
+	        	            } catch (IOException e) {
+	        	            	Log.e(TAG, e.getMessage());
+	        	            }
+	        	        }
+	        	    }
 		        }
 		        
 		    }

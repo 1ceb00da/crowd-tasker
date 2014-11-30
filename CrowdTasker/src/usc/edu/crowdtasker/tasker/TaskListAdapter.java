@@ -64,7 +64,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 			
 			@Override
 			protected void onPostExecute(List<Task> result) {
-				if(progressDialog.isShowing())
+				if(progressDialog != null && progressDialog.isShowing())
 					progressDialog.dismiss();
 
 				if(tasks == null || oldStatuses == null){

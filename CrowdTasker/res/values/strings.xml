@@ -126,5 +126,6 @@
 	
 	<string name="no_tasks">No tasks&#8230;</string>
 	<string name="loading_profile">Loading profile&#8230;</string>
+	<string name="profile_pic_error">Error: Profile picture could not be uploaded</string>
 	
 </resources>

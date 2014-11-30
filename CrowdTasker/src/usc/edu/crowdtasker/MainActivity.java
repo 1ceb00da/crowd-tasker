@@ -82,7 +82,7 @@ public class MainActivity extends ActionBarActivity implements
                 actionBar.setSelectedNavigationItem(position);
             }
         });
-
+        
         // For each of the sections in the app, add a tab to the action bar.
         for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
             // Create a tab with text corresponding to the page title defined by
@@ -102,7 +102,9 @@ public class MainActivity extends ActionBarActivity implements
     }
     
     @Override
-    protected void onResume() {    
+    protected void onResume() {  
+    	super.onResume();
+
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         currentUser = UserProvider.getCurrentUser(getApplicationContext());
         
@@ -113,7 +115,6 @@ public class MainActivity extends ActionBarActivity implements
     	}	
     	
     	mSectionsPagerAdapter.updateCurrentFragment();
-    	super.onResume();
     }
 
     @Override

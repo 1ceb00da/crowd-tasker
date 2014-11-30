@@ -107,7 +107,8 @@ public class NewTaskActivity extends Activity {
 				
 				@Override
 				protected void onPostExecute(Task task) {
-					progressDialog.dismiss();
+					if(progressDialog.isShowing())
+						progressDialog.dismiss();
 					if(task != null){
 						currentTask = task;
 						setFieldsFromTask();
@@ -297,7 +298,8 @@ public class NewTaskActivity extends Activity {
 			
 			@Override
 			protected void onPostExecute(Boolean result) {
-				progressDialog.dismiss();
+				if(progressDialog.isShowing())
+					progressDialog.dismiss();
 				if(currentTask.getId() == null){
 		    		if(result){
 		        		Toast.makeText(getApplicationContext(), 

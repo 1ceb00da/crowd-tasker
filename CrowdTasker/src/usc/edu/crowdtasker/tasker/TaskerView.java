@@ -22,9 +22,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-
-
-
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -84,8 +81,7 @@ public class TaskerView extends Fragment implements UpdatableFragment{
 			}
 		});
         
-       // update();
-	  
+    	taskListAdapter.updateTasks();	  
       
         newTaskBtn = (Button)(rootView.findViewById(R.id.new_task_btn));
         newTaskBtn.setOnClickListener(new OnClickListener () {

@@ -430,7 +430,8 @@ public class TaskStatusActivity extends FragmentActivity{
 							
 							@Override
 							protected void onPostExecute(Boolean result) {
-								progressDialog.dismiss();
+								if(progressDialog.isShowing())
+									progressDialog.dismiss();
 								if(result){
 									Toast.makeText(getApplicationContext(),
 											R.string.task_delete_success, Toast.LENGTH_LONG).show();
