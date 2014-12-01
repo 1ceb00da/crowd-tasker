@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,8 @@ import android.widget.TextView;
 
 public class TaskListAdapter extends ArrayAdapter<Task> {
 
+	public static final String TAG = "TaskListAdapter";
+	
 	private User user;
 	private List<Task> tasks;
 	private Context context;
@@ -64,9 +67,14 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 			
 			@Override
 			protected void onPostExecute(List<Task> result) {
-				if(progressDialog != null && progressDialog.isShowing())
-					progressDialog.dismiss();
-
+				
+				try{
+					if(progressDialog != null && progressDialog.isShowing())
+						progressDialog.dismiss();
+				}catch(Exception e){
+					Log.e(TAG, e.getMessage());
+				}
+				
 				if(tasks == null || oldStatuses == null){
 					tasks = result;
 					oldStatuses = new HashMap<Long, TaskStatus>();
