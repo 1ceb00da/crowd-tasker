@@ -267,7 +267,7 @@ public class WorkerView extends Fragment implements LocationListener,
 							showTaskDetailsPanel(task);
 							onClick(acceptBtn);
 							opt.icon(BitmapDescriptorFactory
-									.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+									.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 							mMap.addMarker(opt);
 							
 							opt = new MarkerOptions();
@@ -275,17 +275,14 @@ public class WorkerView extends Fragment implements LocationListener,
 									task.getDropoffLocation()[1]);
 							opt.position(pickupLoc);
 							opt.icon(BitmapDescriptorFactory
-									.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
+									.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 							mMap.addMarker(opt);
 							return;
 						}
 						opt.icon(BitmapDescriptorFactory
-								.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+								.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 						break;
 					case COMPLETED:
-						opt.icon(BitmapDescriptorFactory
-								.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-
 						break;
 					}
 
@@ -466,7 +463,7 @@ public class WorkerView extends Fragment implements LocationListener,
 			return;
 		}
 		
-		if (task.getStatus() == Task.TaskStatus.COMPLETED) {
+		/*if (task.getStatus() == Task.TaskStatus.COMPLETED) {
 			Toast.makeText(getActivity(),
 					"Task already comeplted. Select some other task",
 					Toast.LENGTH_SHORT).show();
@@ -474,7 +471,7 @@ public class WorkerView extends Fragment implements LocationListener,
 					.findViewById(R.id.task_details_panel);
 			taskPanel.setVisibility(View.GONE);
 			return;
-		}
+		}*/
 		
 		currentTask = task;
 		final RelativeLayout taskPanel = (RelativeLayout) rootView
