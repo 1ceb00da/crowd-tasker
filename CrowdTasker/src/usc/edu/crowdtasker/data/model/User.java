@@ -1,14 +1,8 @@
 package usc.edu.crowdtasker.data.model;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import usc.edu.crowdtasker.data.provider.DataProvider;
-
-import android.text.TextUtils;
 import android.util.Log;
 
 public class User extends JSONBase{

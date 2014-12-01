@@ -144,22 +144,9 @@ public class MainActivity extends ActionBarActivity implements
 	    	default:
 	    		break;
     	}
-        // update the main content by replacing fragments
-        //FragmentManager fragmentManager = getSupportFragmentManager();
-        //fragmentManager.beginTransaction()
-        //        .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-        //        .commit();
     }
 
-    /*
-    public void restoreActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
-    }*/
-    
-
+   
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

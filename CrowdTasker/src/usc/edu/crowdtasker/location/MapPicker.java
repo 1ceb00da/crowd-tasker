@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import usc.edu.crowdtasker.R;
-import usc.edu.crowdtasker.data.model.Task;
-import usc.edu.crowdtasker.tasker.NewTaskActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
@@ -21,8 +19,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -50,9 +46,6 @@ public class MapPicker extends FragmentActivity
 	
 	private GoogleMap mMap;
     private FrameLayout mapWrapper;
-    
-    private Button okBtn;
-    private Button cancelBtn;
     private TextView titleView;
 
 	private LocationManager locationManager;

@@ -108,8 +108,6 @@ public class TaskerView extends Fragment implements UpdatableFragment{
 
 	@Override
 	public void update() {
-//		if(taskListAdapter != null)
-//			taskListAdapter.clearTaskStatuses();
 		if(updateTimer != null){
         	updateTimer.cancel();
         	updateTimer.purge();
