@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="usc.edu.crowdtasker"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0" 
+    android:screenOrientation="portrait">
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -22,7 +23,7 @@
 	    android:required="true"/>
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/ic_workers"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <meta-data android:name="com.google.android.maps.v2.API_KEY"
@@ -31,6 +32,7 @@
         <meta-data android:name="com.google.android.gms.version"
         		android:value="@integer/google_play_services_version" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
@@ -41,26 +43,36 @@
         </activity>
         
         <activity
+            android:screenOrientation="portrait"
             android:name=".tasker.NewTaskActivity"
             android:label="@string/app_name"/>
         
         <activity
+            android:screenOrientation="portrait"
             android:name="usc.edu.crowdtasker.location.MapPicker"
             android:label="@string/app_name"/>
         
         <activity
+            android:screenOrientation="portrait"
    			android:name="usc.edu.crowdtasker.settings.SettingsActivity"
     		android:label="@string/settings" />
         <activity
+            android:screenOrientation="portrait"
    			android:name="usc.edu.crowdtasker.LoginActivity"
     		android:label="@string/app_name" />
         <activity
+            android:screenOrientation="portrait"
    			android:name="usc.edu.crowdtasker.RegisterActivity"
     		android:label="@string/app_name" />
         
          <activity
+             android:screenOrientation="portrait"
    			android:name="usc.edu.crowdtasker.tasker.TaskStatusActivity"
-    		android:label="@string/app_name" />
+    		android:label="@string/task_status" />
+        <activity
+            android:screenOrientation="portrait"
+   			android:name="usc.edu.crowdtasker.ProfileActivity"
+    		android:label="@string/profile" />
         
         
     </application>

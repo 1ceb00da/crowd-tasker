@@ -4,6 +4,8 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import usc.edu.crowdtasker.R;
@@ -14,6 +16,7 @@ import usc.edu.crowdtasker.data.provider.TaskProvider;
 import usc.edu.crowdtasker.data.provider.UserProvider;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -32,7 +35,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +48,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -56,12 +62,12 @@ import usc.edu.crowdtasker.worker.TaskCompletionDialogFragment.OnFinishListener;
 
 public class WorkerView extends Fragment implements LocationListener,
 		OnMarkerClickListener, OnMapClickListener, UpdatableFragment,
-		OnClickListener, OnFinishListener{
+		OnClickListener, OnFinishListener {
 
 	public static final String TAG = "WorkerView";
 
 	private GoogleMap mMap;
-	private FrameLayout mapWrapper;
+	private RelativeLayout mapWrapper;
 	private View rootView;
 	private LocationManager locationManager;
 
@@ -70,13 +76,13 @@ public class WorkerView extends Fragment implements LocationListener,
 
 	private boolean locationInitialized = false;
 	private boolean isOnTask = false;
-	
+
 	private HashMap<Marker, Task> taskMarkerMapping;
 	private Marker openPickupMarker;
 	private Marker openDropoffMarker;
 
 	private Marker currentLocationMarker;
-	
+
 	private Location currentLocation;
 	private Polyline currentRoutePoly;
 
@@ -89,10 +95,16 @@ public class WorkerView extends Fragment implements LocationListener,
 
 	private Button acceptBtn;
 	private Button declineBtn;
-	
+
+	private ImageView taskerPicture;
+	private Bitmap currentTaskerPicture;
 	private TextView timerTextView;
 	private CountDownTimer timer;
 	private Time currentTime;
+
+	public static final int UPDATE_INTERVAL = 10000; // Update interval in
+														// milliseconds
+	private Timer updateTimer;
 
 	/**
 	 * Returns a new instance of this fragment for the given section number.
@@ -113,18 +125,19 @@ public class WorkerView extends Fragment implements LocationListener,
 		View rootView = inflater
 				.inflate(R.layout.worker_view, container, false);
 		this.rootView = rootView;
-		mapWrapper = (FrameLayout) rootView.findViewById(R.id.map_wrapper);
+		mapWrapper = (RelativeLayout) rootView.findViewById(R.id.map_wrapper);
 		mapWrapper.setVisibility(View.INVISIBLE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		setUpMapIfNeeded();
 
 		acceptBtn = (Button) rootView.findViewById(R.id.accpetTaskBtn);
 		declineBtn = (Button) rootView.findViewById(R.id.declineTaskBtn);
+		taskerPicture = (ImageView) rootView.findViewById(R.id.tasker_picture);
 
 		dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
 				DateFormat.SHORT);
 		moneyFormat = NumberFormat.getCurrencyInstance();
-		
+
 		timerTextView = (TextView) rootView.findViewById(R.id.timerTextView);
 
 		return rootView;
@@ -133,6 +146,10 @@ public class WorkerView extends Fragment implements LocationListener,
 	@Override
 	public void onDestroyView() {
 		locationManager.removeUpdates(this);
+		if (updateTimer != null) {
+			updateTimer.cancel();
+			updateTimer.purge();
+		}
 		super.onDestroyView();
 	}
 
@@ -216,25 +233,61 @@ public class WorkerView extends Fragment implements LocationListener,
 					LatLng pickupLoc = new LatLng(task.getPickupLocation()[0],
 							task.getPickupLocation()[1]);
 					opt.position(pickupLoc);
-					if (currentUser != null
-							&& task.getOwnerId() == currentUser.getId())
-						opt.icon(BitmapDescriptorFactory
-								.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-					else
+					switch (task.getStatus()) {
+
+					case CREATED:
+					case CANCELED:
+						if (task.getOwnerId() == currentUser.getId()) {
+							opt.icon(BitmapDescriptorFactory
+									.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+						} else {
+							opt.icon(BitmapDescriptorFactory
+									.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+						}
+						break;
+
+					case ACCEPTED:
+						if (task.getWorkerId() == currentUser.getId()) {
+							currentTask = task;							
+							String pickUp = task.getPickupAddress();
+							String dropOff = task.getDropoffAddress();
+
+							new AsyncTask<String, Void, List<LatLng>>() {
+								@Override
+								protected List<LatLng> doInBackground(String... params) {
+									return RouteProvider.getRoute(params[0], params[1]);
+								}
+
+								@Override
+								protected void onPostExecute(List<LatLng> result) {
+									showRoute(result);
+								}
+							}.execute(pickUp, dropOff);
+							
+							showTaskDetailsPanel(task);
+							onClick(acceptBtn);
+							opt.icon(BitmapDescriptorFactory
+									.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+							mMap.addMarker(opt);
+							
+							opt = new MarkerOptions();
+							pickupLoc = new LatLng(task.getDropoffLocation()[0],
+									task.getDropoffLocation()[1]);
+							opt.position(pickupLoc);
+							opt.icon(BitmapDescriptorFactory
+									.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+							mMap.addMarker(opt);
+							return;
+						}
 						opt.icon(BitmapDescriptorFactory
 								.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+						break;
+					case COMPLETED:
+						break;
+					}
 
 					Marker marker = mMap.addMarker(opt);
 					taskMarkerMapping.put(marker, task);
-
-					// icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
-
-					/*
-					 * opt = new MarkerOptions(); LatLng dropoffLoc = new
-					 * LatLng(task.getDropoffLoc()[0], task.getDropoffLoc()[1]);
-					 * opt.position(dropoffLoc); opt.title("Dropoff " +
-					 * task.getName()); mMap.addMarker(opt);
-					 */
 				}
 			}
 		}.execute(currentLocation);
@@ -247,28 +300,24 @@ public class WorkerView extends Fragment implements LocationListener,
 		if (isOnTask) {
 			double dropOffLat = currentTask.getDropoffLocation()[0];
 			double dropOffLon = currentTask.getDropoffLocation()[1];
-			
+
 			double currentLat = location.getLatitude();
 			double currentLon = location.getLongitude();
 
 			// Check differnece between latllong of dest at 4th decimal place
 			// the 4th decimal place is accurate upto 11m
-			
-			double currentLoc[] = new double[]{currentLat, currentLon};
-			double dropOffLoc[] = new double[]{dropOffLat, dropOffLon};
-			
+
+			double currentLoc[] = new double[] { currentLat, currentLon };
+			double dropOffLoc[] = new double[] { dropOffLat, dropOffLon };
+
 			if (isCloseTo(currentLoc, dropOffLoc)) {
 				Log.d(TAG, "Approaching destination");
 				showTaskCompletionDialog();
 			}
-			else {
-				if (currentLocationMarker == null) {
-					// TODO display a moving marker
-				}
-			}
-			Log.d(TAG, "cur =" + currentLoc[0] + "," + currentLoc[1] + ";;;, des =" + dropOffLoc[0] + "," + dropOffLoc[1]);
+			Log.d(TAG, "cur =" + currentLoc[0] + "," + currentLoc[1]
+					+ ";;;, des =" + dropOffLoc[0] + "," + dropOffLoc[1]);
 		}
-		
+
 		if (!locationInitialized) {
 			LatLng latLng = new LatLng(currentLocation.getLatitude(),
 					currentLocation.getLongitude());
@@ -280,33 +329,32 @@ public class WorkerView extends Fragment implements LocationListener,
 			update();
 		}
 	}
-	
+
 	private boolean showingTaskCompletionDialog = false;
+
 	private void showTaskCompletionDialog() {
 		if (showingTaskCompletionDialog) {
 			return;
-		}
-		else {
+		} else {
 			FragmentManager fragmentManager = getFragmentManager();
-			TaskCompletionDialogFragment TaskCompletionDialog = new TaskCompletionDialogFragment(currentTask, this);
-			TaskCompletionDialog.setCancelable(false);
-			TaskCompletionDialog.setDialogTitle("Looks like you're near the destination");
+			TaskCompletionDialogFragment TaskCompletionDialog = new TaskCompletionDialogFragment(
+					currentTask, this);
+			TaskCompletionDialog.setCancelable(true);
+			TaskCompletionDialog.setDialogTitle("Approaching Destination");
 			TaskCompletionDialog.show(fragmentManager, "Yes/No Dialog");
-			showingTaskCompletionDialog = true;	
+			showingTaskCompletionDialog = true;
 		}
-		
+
 	}
+
 	public void onFinish(boolean completionResult) {
 		if (completionResult) {
 			currentTask.setStatus(Task.TaskStatus.COMPLETED);
-		}
-		else {
-			//TODO : Handle task not comepleted state
-			// possible reaon for task incomepletion maybe 
-			// destination not present, destination not opened door 
+		} else {
+			// TODO : Handle task not comepleted state
+			// possible reaon for task incomepletion maybe
+			// destination not present, destination not opened door
 			// etc
-			
-			// TEMP - set task as created
 			currentTask.setStatus(Task.TaskStatus.CANCELED);
 			// TODO:Display form for greivance or why task want not completed
 		}
@@ -315,32 +363,31 @@ public class WorkerView extends Fragment implements LocationListener,
 			protected Boolean doInBackground(Task... params) {
 				return TaskProvider.updateTask(params[0]);
 			}
+
 			@Override
 			protected void onPostExecute(Boolean p) {
-				
+				update();
 			}
-			
+
 		}.execute(currentTask);
-		
-		
+
 		// update view
 		isOnTask = false;
 		rootView.findViewById(R.id.accpetTaskBtn).setVisibility(View.VISIBLE);
 		rootView.findViewById(R.id.declineTaskBtn).setVisibility(View.GONE);
 		timer.cancel();
 		String res = completionResult ? "Completed" : "Cancelled";
-		
-		Toast.makeText(getActivity(), "Task " + res, Toast.LENGTH_LONG).show();;
-				timerTextView.setText("");
+
+		Toast.makeText(getActivity(), "Task " + res, Toast.LENGTH_LONG).show();
+		;
+		timerTextView.setText("");
+		timerTextView.setVisibility(View.GONE);
+		taskerPicture.setVisibility(View.VISIBLE);
 	}
-	
-	
+
 	private boolean isCloseTo(double[] currentLoc, double[] dropOffLoc) {
 		double diffLat = currentLoc[0] - dropOffLoc[0];
 		double diffLon = currentLoc[1] - dropOffLoc[1];
-		
-		Log.d(TAG, "Math.abs(diffLat)=" + Math.abs(diffLat) + ", Math.abs(diffLon)=" + Math.abs(diffLon));
-		
 		if ((Math.abs(diffLat) < 0.001) && (Math.abs(diffLon) < 0.001)) {
 			return true;
 		}
@@ -375,7 +422,7 @@ public class WorkerView extends Fragment implements LocationListener,
 						.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 
 				openDropoffMarker = mMap.addMarker(opt);
-				
+
 				// Show route
 				if (currentRoutePoly != null) {
 					currentRoutePoly.remove();
@@ -399,7 +446,6 @@ public class WorkerView extends Fragment implements LocationListener,
 			}
 			openPickupMarker = marker;
 			openPickupMarker.showInfoWindow();
-			
 
 			fitToOpenMarkers();
 		}
@@ -407,8 +453,28 @@ public class WorkerView extends Fragment implements LocationListener,
 	}
 
 	private void showTaskDetailsPanel(Task task) {
+		if (task.getOwnerId() == currentUser.getId()) {
+			Toast.makeText(getActivity(),
+					"Cannot accept your own tasks! Select some other task",
+					Toast.LENGTH_SHORT).show();
+			final RelativeLayout taskPanel = (RelativeLayout) rootView
+					.findViewById(R.id.task_details_panel);
+			taskPanel.setVisibility(View.GONE);
+			return;
+		}
+		
+		/*if (task.getStatus() == Task.TaskStatus.COMPLETED) {
+			Toast.makeText(getActivity(),
+					"Task already comeplted. Select some other task",
+					Toast.LENGTH_SHORT).show();
+			final RelativeLayout taskPanel = (RelativeLayout) rootView
+					.findViewById(R.id.task_details_panel);
+			taskPanel.setVisibility(View.GONE);
+			return;
+		}*/
+		
 		currentTask = task;
-		final LinearLayout taskPanel = (LinearLayout) rootView
+		final RelativeLayout taskPanel = (RelativeLayout) rootView
 				.findViewById(R.id.task_details_panel);
 		taskPanel.setVisibility(View.VISIBLE);
 
@@ -418,6 +484,9 @@ public class WorkerView extends Fragment implements LocationListener,
 		TextView deadline = (TextView) rootView.findViewById(R.id.deadline);
 		TextView payment = (TextView) rootView.findViewById(R.id.payment);
 		final TextView tasker = (TextView) rootView.findViewById(R.id.tasker);
+
+		final RatingBar taskerRating = (RatingBar) rootView
+				.findViewById(R.id.tasker_rating_bar);
 
 		if (currentTask.getName() != null)
 			taskName.setText(currentTask.getName());
@@ -436,24 +505,49 @@ public class WorkerView extends Fragment implements LocationListener,
 
 				@Override
 				protected User doInBackground(Long... params) {
-					return UserProvider.getUserById(params[0]);
+					User user = UserProvider.getUserById(params[0]);
+					currentTaskerPicture = UserProvider.getProfilePic(user);
+					return user;
 				}
 
 				@Override
 				protected void onPostExecute(User result) {
-					if (result != null)
+					if (result != null) {
+
+						setTaskerPicture(currentTaskerPicture);
 						tasker.setText(result.getLogin());
-					else
+						if (result.getRating() != null)
+							taskerRating.setRating(result.getRating()
+									.floatValue());
+					} else {
 						tasker.setText(R.string.not_assigned);
+					}
 				}
 
-			}.execute(currentTask.getWorkerId());
+			}.execute(currentTask.getOwnerId());
 		} else
 			tasker.setText(R.string.not_assigned);
 
 		acceptBtn.setOnClickListener(this);
 		declineBtn.setOnClickListener(this);
 
+	}
+
+	private Bitmap setTaskerPicture(Bitmap pic) {
+		if (pic == null)
+			return null;
+		Log.d(TAG, pic.getWidth() + " " + pic.getHeight());
+		double max = Math.max(pic.getHeight(), pic.getWidth());
+		double factor = taskerPicture.getWidth() / max;
+
+		if (factor == 0) {
+			return null;
+		}
+		Bitmap scaledBmp = Bitmap.createScaledBitmap(pic,
+				(int) (factor * pic.getWidth()),
+				(int) (factor * pic.getHeight()), false);
+		taskerPicture.setImageBitmap(scaledBmp);
+		return scaledBmp;
 	}
 
 	private void showRoute(List<LatLng> routePoints) {
@@ -494,14 +588,13 @@ public class WorkerView extends Fragment implements LocationListener,
 
 	@Override
 	public void onMapClick(LatLng latLng) {
-		
+
 		// if worker is performing a task
 		// do nothing
 		if (isOnTask) {
-			//do nothing
-			
-		}
-		else {
+			// do nothing
+
+		} else {
 			// hide task details panel
 			mapWrapper.findViewById(R.id.task_details_panel).setVisibility(
 					View.GONE);
@@ -511,7 +604,7 @@ public class WorkerView extends Fragment implements LocationListener,
 			if (openDropoffMarker != null) {
 				openDropoffMarker.remove();
 				openDropoffMarker = null;
-			}			
+			}
 		}
 	}
 
@@ -536,43 +629,71 @@ public class WorkerView extends Fragment implements LocationListener,
 
 	private void updateViewForTaskAbort() {
 		// TODO: display dialogbox to abort task
-		
+		currentTask.setStatus(Task.TaskStatus.CANCELED);
+		Log.d(TAG, "cancelled the task");
+
+		new AsyncTask<Task, Void, Boolean>() {
+			@Override
+			protected Boolean doInBackground(Task... params) {
+				return TaskProvider.updateTask(params[0]);
+			}
+
+			@Override
+			protected void onPostExecute(Boolean c) {
+				Toast.makeText(getActivity(), "Task Aborted",
+						Toast.LENGTH_SHORT).show();
+			}
+
+		}.execute(currentTask);
+
 		timer.cancel();
+		timerTextView.setVisibility(View.GONE);
+		taskerPicture.setVisibility(View.VISIBLE);
 		Log.d(TAG + "; Abort pressed", currentTask.toJSON().toString());
 	}
 
 	private void updateViewForTaskAccept() {
-		
+
 		// Show timer
+		showingTaskCompletionDialog = false;
 		currentTime = new Time();
 		currentTime.setToNow();
 		final long dl = currentTask.getDeadline().getTime();
 		final long ct = currentTime.toMillis(true);
-		
+
 		Log.d(TAG + " TIMER ", "" + (ct - dl));
-		
+
 		timerTextView = (TextView) rootView.findViewById(R.id.timerTextView);
-		timer = new CountDownTimer(ct - dl, 1000) {
+		taskerPicture.setVisibility(View.GONE);
+		timerTextView.setVisibility(View.VISIBLE);
+		timer = new CountDownTimer(dl - ct, 1000) {
 
 			public void onTick(long millisUntilFinished) {
 				String text = dateFormat.format((millisUntilFinished / 1000));
-				
+
 				long seconds = millisUntilFinished / 1000;
 				long minutes = seconds / 60;
 				long hours = minutes / 60;
 				long days = hours / 24;
-			
-				text = String.format("%02d:%02d:%02d:%02d",
-						TimeUnit.MILLISECONDS.toDays(millisUntilFinished),
-						
-						TimeUnit.MILLISECONDS.toHours(millisUntilFinished) -
-						TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays(millisUntilFinished)),
-						
-						TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) -  
-						TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
-						
-						TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - 
-						TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)));
+
+				text = String
+						.format("%02d:%02d:%02d:%02d",
+								TimeUnit.MILLISECONDS
+										.toDays(millisUntilFinished),
+								TimeUnit.MILLISECONDS
+										.toHours(millisUntilFinished)
+										- TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS
+												.toDays(millisUntilFinished)),
+								TimeUnit.MILLISECONDS
+										.toMinutes(millisUntilFinished)
+										- TimeUnit.HOURS
+												.toMinutes(TimeUnit.MILLISECONDS
+														.toHours(millisUntilFinished)),
+								TimeUnit.MILLISECONDS
+										.toSeconds(millisUntilFinished)
+										- TimeUnit.MINUTES
+												.toSeconds(TimeUnit.MILLISECONDS
+														.toMinutes(millisUntilFinished)));
 				timerTextView.setText(text);
 			}
 
@@ -583,20 +704,22 @@ public class WorkerView extends Fragment implements LocationListener,
 
 		currentTask.setStatus(Task.TaskStatus.ACCEPTED);
 		currentTask.setWorkerId(currentUser.getId());
-		
-		currentTask.setWorkerLocation(new double[]
-				{currentLocation.getLatitude(), currentLocation.getLongitude()});
-		Log.d(TAG , "accpeted a task");
+
+		currentTask
+				.setWorkerLocation(new double[] {
+						currentLocation.getLatitude(),
+						currentLocation.getLongitude() });
+		Log.d(TAG, "accpeted a task");
 
 		new AsyncTask<Task, Void, Boolean>() {
 			@Override
 			protected Boolean doInBackground(Task... params) {
 				return TaskProvider.updateTask(params[0]);
 			}
-			
+
 		}.execute(currentTask);
 	}
-	
+
 	@Override
 	public void onProviderDisabled(String provider) {
 	}
@@ -613,12 +736,15 @@ public class WorkerView extends Fragment implements LocationListener,
 	public void update() {
 		currentUser = UserProvider.getCurrentUser(getActivity());
 		showTasksOnMap(currentLocation);
+
 	}
 
 	@Override
 	public void stopUpdate() {
-		// TODO Auto-generated method stub
-		
+		if (updateTimer != null) {
+			updateTimer.cancel();
+			updateTimer.purge();
+		}
 	}
 
 }

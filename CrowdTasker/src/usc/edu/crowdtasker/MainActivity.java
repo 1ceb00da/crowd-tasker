@@ -177,6 +177,8 @@ public class MainActivity extends ActionBarActivity implements
         	onNavigationDrawerItemSelected(NavigationDrawerFragment.NAV_SETTINGS);
         } else if (id == R.id.action_logout){
         	onNavigationDrawerItemSelected(NavigationDrawerFragment.NAV_LOGOUT);
+        } else if (id == R.id.action_profile){
+        	onNavigationDrawerItemSelected(NavigationDrawerFragment.NAV_PROFILE);
         }
         return super.onOptionsItemSelected(item);
     }

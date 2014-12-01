@@ -2,8 +2,6 @@ package usc.edu.crowdtasker.worker;
 
 import usc.edu.crowdtasker.R;
 import usc.edu.crowdtasker.data.model.Task;
-import usc.edu.crowdtasker.data.provider.TaskProvider;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;

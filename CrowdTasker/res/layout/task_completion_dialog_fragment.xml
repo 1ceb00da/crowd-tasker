@@ -20,19 +20,21 @@
 
         <Button
             android:id="@+id/btnYes"
-            android:layout_width="145dp"
+            android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:background="#00CC66"
             android:text="Completed"
+            style="@style/GeneralButton"
             android:textColor="#fff"
             android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnNo"
-            android:layout_width="145dp"
+            android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
+            style="@style/GeneralButton"
             android:background="#FF3333"
             android:text="Cancel Task"
             android:textColor="#fff"
