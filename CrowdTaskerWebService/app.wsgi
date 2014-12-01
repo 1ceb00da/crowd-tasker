@@ -3,6 +3,7 @@ import os
 
 # Change working directory so relative paths (and template lookup) work again
 root_folder = os.path.dirname(__file__)
+web_folder = "C:\\web\\uploads\\"
 os.chdir(root_folder)
 os.environ['ORACLE_HOME'] = "C:\\oracle\\instantclient_11_2"
 os.environ['PATH']  = os.environ['PATH'] + os.environ['ORACLE_HOME']+";"+os.path.dirname(__file__)
@@ -47,6 +48,6 @@ def upload_profile():
     
 @route('/uploads/<filename>')
 def get_uploads(filename):
-    return static_file(filename, "C:\\web\\uploads\\")
+    return static_file(filename, web_folder)
 
 application = default_app()

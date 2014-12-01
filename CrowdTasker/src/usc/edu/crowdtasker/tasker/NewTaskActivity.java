@@ -284,6 +284,14 @@ public class NewTaskActivity extends Activity {
     	if(currentTask.getStatus() == null)
     		currentTask.setStatus(TaskStatus.CREATED);
     	
+    	if(TextUtils.isEmpty(currentTask.getName())|| TextUtils.isEmpty(currentTask.getDescription())
+    	   || currentTask.getDeadline() == null || currentTask.getOwnerId() == null
+    	   || currentTask.getPayment() == null || currentTask.getDropoffLocation() == null
+    	   || currentTask.getPickupLocation() == null){
+    		Toast.makeText(getApplicationContext(), R.string.task_fill_out_error, Toast.LENGTH_LONG).show();
+    		return;
+    	}
+    	
     	progressDialog.setMessage(getString(R.string.saving_task));
 	   	progressDialog.show();
 	   	
@@ -324,7 +332,7 @@ public class NewTaskActivity extends Activity {
     }
     
     private void setFieldsFromTask(){
-
+    	System.err.println("CURR TASK GETNAME "+currentTask.getName());
     	if(currentTask.getName() != null)
     		nameEt.setText(currentTask.getName());
     	

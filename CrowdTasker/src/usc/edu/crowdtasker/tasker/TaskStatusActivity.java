@@ -24,6 +24,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -48,6 +49,8 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 public class TaskStatusActivity extends FragmentActivity{
+	
+	public static final String TAG = "TaskStatusActivity";
 	
     public static final long UPDATE_INTERVAL = 10000;
 
@@ -315,16 +318,23 @@ public class TaskStatusActivity extends FragmentActivity{
 						}
 						if(currentWorkerPic != null)
 							setWorkerPic(currentWorkerPic);
-						
-						if(progressDialog.isShowing())
-							progressDialog.dismiss();
+						try{
+							if(progressDialog.isShowing())
+								progressDialog.dismiss();
+						}catch(Exception e){
+							Log.e(TAG, e.getMessage());
+						}
 					}
 		    		
 		    	}.execute(currentTask.getWorkerId());
 	    	}else {
 	    		workerView.setText(R.string.not_assigned);
-	    		if(progressDialog.isShowing())
-					progressDialog.dismiss();
+	    		try{
+					if(progressDialog.isShowing())
+						progressDialog.dismiss();
+				}catch(Exception e){
+					Log.e(TAG, e.getMessage());
+				}
 	    	}
 	    	
 	    	if(currentWorkerMarker != null)
@@ -430,8 +440,12 @@ public class TaskStatusActivity extends FragmentActivity{
 							
 							@Override
 							protected void onPostExecute(Boolean result) {
-								if(progressDialog.isShowing())
-									progressDialog.dismiss();
+								try{
+									if(progressDialog.isShowing())
+										progressDialog.dismiss();
+								}catch(Exception e){
+									Log.e(TAG, e.getMessage());
+								}
 								if(result){
 									Toast.makeText(getApplicationContext(),
 											R.string.task_delete_success, Toast.LENGTH_LONG).show();
@@ -477,7 +491,12 @@ public class TaskStatusActivity extends FragmentActivity{
 									dialog.dismiss();
 									setFieldsFromTask();
 								}else{
-					    			progressDialog.dismiss();
+									try{
+										if(progressDialog.isShowing())
+											progressDialog.dismiss();
+									}catch(Exception e){
+										Log.e(TAG, e.getMessage());
+									}
 									Toast.makeText(getApplicationContext(),
 											R.string.task_cancel_error, Toast.LENGTH_LONG).show();
 									dialog.dismiss();

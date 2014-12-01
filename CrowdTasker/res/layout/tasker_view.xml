@@ -22,15 +22,17 @@
 	    android:layout_height="1dip"
 	    android:background="?android:attr/listDivider" 
 	    android:layout_below="@id/new_task_btn"/>
+	
     <ListView
         android:id = "@+id/task_list_view"
 	    android:layout_width="match_parent"
-	    android:layout_height="match_parent"
+	    android:layout_height="wrap_content"
 	    android:choiceMode="singleChoice"
 	    android:headerDividersEnabled="true"
 	    android:divider="#cccc"
 	    android:dividerHeight="1dp"
-	    android:layout_below="@id/header_divider"/>
+	    android:layout_below="@id/header_divider"
+	    android:fastScrollEnabled="true"/>
     <TextView android:id="@+id/task_list_empty_view"
         android:text="@string/no_tasks"
         android:layout_width="wrap_content" 
