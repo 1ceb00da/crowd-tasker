@@ -332,11 +332,10 @@ public class NewTaskActivity extends Activity {
     }
     
     private void setFieldsFromTask(){
-    	System.err.println("CURR TASK GETNAME "+currentTask.getName());
-    	if(currentTask.getName() != null)
+    	if(currentTask.getName() != null && !TextUtils.isEmpty(currentTask.getName()))
     		nameEt.setText(currentTask.getName());
     	
-    	if(currentTask.getDescription() != null)
+    	if(currentTask.getDescription() != null && !TextUtils.isEmpty(currentTask.getDescription()))
     		descriptionEt.setText(currentTask.getDescription());
     	
     	if(currentTask.getDeadline() != null)
